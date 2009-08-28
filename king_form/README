@@ -1,0 +1,55 @@
+KingForm
+==========
+Writing forms is is an enerving repetitive task. It already got easier through rails
+but still you have to huddle with a lot of html, erb markup around your fields.
+
+King forms internals are based on haml, rails' form helpers, I18n translations
+and a simplified syntax for fieldnames.
+
+Additionally it includes a nested_form_helper to easiely show related models in a form.
+
+
+== Example erb
+
+== Example haml
+
+== Example KingForm
+
+== Example Nested Forms
+
+The first thing you need to do is enable attributes on the association in the model.
+  
+  class Project < ActiveRecord::Base
+    has_many :tasks
+    accepts_nested_attributes_for :tasks
+  end
+
+The partial for the nested object(one Task) should have the name of the associated element's type( or the partial to use)
+
+  ## projects/_task.html.erb
+  <div class="task">
+    <label>Title</label>
+    <%= f.text_field :title %>
+  </div>
+
+In the parent element's form (Project), call the render_nested_form method, with the collection of
+elements you'd like to render as the first argument.
+
+  ## projects/_form.html.erb
+  <%= f.render_nested_form(@project.tasks) %>
+
+That call will render the partial named _task.html.erb with each element in the supplied collection of tasks, wrapping
+the partial in a form builder (fields_for) with all the necessary arguments to produce a hash that will satisfy the
+tasks_attributes method(provided by Rails new accepts_nested_attributes_for).
+
+=== Options
+See comments in lib/nested_form_helper for full reference of options.
+You may want to add a few blank tasks to the bottom of your form; no need to do that in the controller anymore.
+
+  <%= f.render_nested_form(@project.tasks, :new => 3, :partial=>'some_partial', :locals=>..) %>
+
+
+
+This plugin was extracted from SalesKing where it was developed by Georg Ledermann
+and Georg Leciejewski
+Copyright (c) 2009 Georg Leciejewski, released under the MIT license
