@@ -9,8 +9,8 @@ module KingList
     #   - dl_for(:client, my_client_object)
     # === Example haml
     #  - dl_for(current_object) do |f|
-    #    = f.show :first_name
-    #    = f.show :last_name
+    #    - f.show :first_name
+    #    - f.show :last_name
     #
     # =>    <dl>
     #         <dt>Firstname</dt>
@@ -62,13 +62,6 @@ module KingList
 
       @template.haml_tag :fieldset, options do
         @template.haml_tag :legend, caption unless caption.blank?
-        @template.haml_concat @template.capture_haml(&block)
-      end
-    end
-
-    # Wraps the given block into "in_line" class
-    def in_line(&block)
-      @template.haml_tag :div, :class => 'in_line' do
         @template.haml_concat @template.capture_haml(&block)
       end
     end

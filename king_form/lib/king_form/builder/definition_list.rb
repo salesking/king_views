@@ -6,8 +6,8 @@ module KingForm
       # ====Example haml
       #  - dl_form_for(current_object) do |f|
       #    - f.section _('legend.user.details') do
-      #      = f.text :first_name
-      #      = f.text :last_name
+      #      - f.text :first_name
+      #      - f.text :last_name
       #
       # => # <fieldset>
       #       <legend>User Details</legend>

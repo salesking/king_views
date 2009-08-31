@@ -8,7 +8,7 @@ module KingForm
     #
     # Subclasses must define the following methods:
     #
-    # ==== section
+    # ==== def section
     # Definition of a section inside a form. A section is a wrapper around fields
     # which belong together. The topmost element should be(most of the time) a fieldset
     # followed by a legend and the openeing definition list.
@@ -16,7 +16,7 @@ module KingForm
     #         fieldset-> legend -> dl -> ...
     # See child class Labeled and DefinitionList for examples.
     #
-    # ==== tag_wrapper
+    # ==== def tag_wrapper
     # Wrapping/display of field descriptions(labels) and input tags
     #   => wrapped with div. actually no wrapping(see above):
     #     fieldset-> div -> label -> input
@@ -24,7 +24,8 @@ module KingForm
     #     fieldset-> dl -> dd -> dt -> input
     #
     #
-    # bundle - handle fields which are displayed toghether inside a wrapper
+    # ==== def bundle
+    # handle fields which are displayed toghether inside a wrapper
     class Base < ActionView::Helpers::FormBuilder
 #      include ActiveSupport::CoreExtensions::String::Inflections
       def initialize(object_name, object, template, options, proc)
@@ -54,9 +55,9 @@ module KingForm
         super(associated, opts)
       end
 
-      ################################################
+      ##########################################################################
       # Convinience Methods for simpler template tags
-      ################################################
+      ##########################################################################
 
       # Generate input tag with title for text editing
       # 1) text(:name)
@@ -103,10 +104,11 @@ module KingForm
         end
       end
 
-      # Generate input tag with title for password editing
+      # Generate password input tag with title
       #
-      # 1) password(:password)
-      # 2) password(:pasword, :title => 'What is your password?', :value => @the_password)
+      # ==== Example
+      #  password :password
+      #  password(:pasword, :title => 'What is your password?', :value => @the_password)
       def password(fieldname, options={})
         title = options.delete(:title) || build_title(fieldname)
 
@@ -125,7 +127,7 @@ module KingForm
       # options<Hash>:: options which will be passed on to textarea helper
       # html_options<Hash>:: options which will be passed on to the wrapping element
       #
-      # === Example
+      # ==== Example
       # 1) memo(:notes)
       # 2) memo(:comment, :title => 'Comment', :value => @the_comment)
       def memo(fieldname, options={}, html_options={})
@@ -141,7 +143,7 @@ module KingForm
 
       # Generate date select tags (day/month/year) with title
       #
-      # Usage:
+      # ==== Example
       #   date :birthday, :title => 'Geburtstag'
       def date(fieldname, options={}, html_options={})
         title = options.delete(:title) || build_title(fieldname)
@@ -172,7 +174,7 @@ module KingForm
       #
       # - dl_fields_for 'custom_obj' do |c|
       #   = c.selection :project_id, :choices => @projects, :title => 'Projects'
-      #   = c.selection 'custom_obj[pills]', :choices => @red_pills, :title => _('project.mite'), :info=>'Help text'
+      #   = c.selection 'custom_obj[pills]', :choices => @red_pills, :title => "Choose your Pill", :info=>'Help text'
       #
       # ==== Parameter
       #  fieldname<String, Symbol>:: The name of the field. Used to build the translated title, find enum values.
@@ -231,9 +233,9 @@ module KingForm
       #
       # f.selection_group :id, :labels => %w(defaults, own), :choices =>[@objects_1, @objects_2], :title =>'my custom title'
       #
-      # f.selection_group :id,  :title => _('template'),
+      # f.selection_group :id,  :title => 'Template',
       #                   :choices => [ @pdf_templates, @pdf_default_templates],
-      #                   :labels=>[ _('user.templates'), _('default.templates')]
+      #                   :labels=>[ 'User Templates', 'Default Templates']
       #
       #
       # Available options keys:
@@ -293,7 +295,7 @@ module KingForm
       # - f.actions do
       #   = f.submit t('form.save')
       #
-      #   = f.submit _('form.button.save'), :span => {:class=>'custom class'}
+      #   = f.submit "save", :span => {:class=>'custom class'}
       #
       #   = f.submit 'Submit Me', :name => 'save', nowrap=>true
       #   = f.submit t('form.save'), :name => 'refresh', nowrap=>true
@@ -329,17 +331,6 @@ module KingForm
           end
         else #display field without span wrapping
           super value, options
-        end
-
-      end
-
-      #a big submit button
-      #It is made big by wrapping it in a span and assigning it some css classes
-      #
-      def submit_big(value, options = {})
-        options[:class] ||= 'send'
-        @template.haml_tag :span, :class=>'input big' do
-          @template.haml_concat(submit(value, options))
         end
       end
 
@@ -467,20 +458,18 @@ module KingForm
         end
       end
 
-      # GetText: "_" is a private Method of the template so
-      # need to call via send
-      def _(*args)
-        @template.send(:_, *args)
-      end
 
       # Shortcut for using "content_tag", which exists in the context of the template
       def content_tag(*args)
         @template.content_tag(*args)
       end
 
-      # Translate acts_as_enum dropdown field values either with I18n or gettext
-      # With gettext a key looks like "Client|Sending Methods|Fax" ->class|fieldname|value
-      # With I18n  a key looks like "clients.enum.sending_methods.fax"
+      # Translate acts_as_enum dropdown field values either with I18n
+      # A key must be lokated in the language file under:
+      # "activerecord.attributes.client.enum.sending_methods.fax"
+      # "activerecord.attributes.client.enum.sending_methods.email"
+      # ==== Parameter
+      # fieldname<String,Symbol>:: The fieldname in the model which holds enum values from acts_as_enum plugin
       def enum_values(fieldname)
         # Check if there is a const in the class defined by acts_as_enum
         return unless current_class.const_defined?(fieldname.to_s.upcase)
@@ -490,14 +479,7 @@ module KingForm
         if values && values.first.is_a?(Symbol)
           values_with_translated_keys = {}
           values.each do |value|
-            gettext_key = current_class.to_s + '|' + fieldname.to_s.humanize + '|Enum|' + value.to_s
-            gettext_trans = _(gettext_key)
-            # take the gettext translation if found TODO: kill when gettext expires
-            if gettext_key != gettext_trans
-              key = gettext_trans 
-            else
-              key = current_class.human_attribute_name("enum.#{fieldname.to_s}.#{value.to_s}")
-            end
+            key = current_class.human_attribute_name("enum.#{fieldname.to_s}.#{value.to_s}")
             values_with_translated_keys[key] = value.to_s
           end
           return values_with_translated_keys
@@ -519,15 +501,10 @@ module KingForm
       # takes the class and fieldname (like  GetText ActiveRecord-Parser )
       # ==== Parameter
       # fieldname_or_title<String,Symbol>:: A string is directly returned.
-      # A Symbol is beeing looked up in gettext or I18n translation.
-      # For gettext your po should contain Company|Name
-      # I18n expects companies.name
+      # A Symbol is beeing looked up in I18n translation inside the models attribute namespace:
+      # => class.human_attribute_name(fieldname_or_title.to_s)
       def build_title(fieldname_or_title)
-        if fieldname_or_title.is_a?(Symbol) # && !@config[:bundle]
-          # glue class and fieldname together "Company|Name" for gettext
-          gettext_key = current_class.to_s + '|' + fieldname_or_title.to_s.humanize
-          # return the gettext translation if found
-          return _(gettext_key) if gettext_key != _(gettext_key)
+        if fieldname_or_title.is_a?(Symbol)
           #i18n namespace under activerecord.attributes.model.attr_name
           current_class.human_attribute_name(fieldname_or_title.to_s) if current_class.respond_to?(:human_attribute_name)
         else
@@ -551,21 +528,19 @@ module KingForm
         tags.blank? ? '' : @template.content_tag(:dd, tags.to_s, options)
       end
 
-      # Build span-tag with infotext
+      # Build span-tag with an info text after a field
       # ==== Parameter
       # fieldname_or_text<String/Symbol>:: static text value or a fieldname as symbol.
-      #                                   If a symbol is given the translated text is taken from gettext
+      # If a symbol is given the translated text is taken from I18n translation file
       def info_tag(fieldname_or_text)
         case fieldname_or_text
         when String #just use the plain string
           value = fieldname_or_text
-        when Symbol # lookup the the field in gettext under User|First name|Info
-          i18n_key = "#{current_class.name.tableize}.#{fieldname_or_text.to_s}_help"
-          gettext_key = current_class.to_s + '|' + fieldname_or_text.to_s.humanize + '|Info'
-          trans = translation(i18n_key, gettext_key)
-          # gettext returns '' when no trans found
-          # i18n returns translation missing when no trans found
-          value = (trans[/^translation missing/] || trans.blank?) ? nil : trans
+        when Symbol # lookup the the field in i18n under activerecord.attributes.class.fieldname_info
+          trans = I18n.translate("#{current_class.name.underscore}.#{fieldname_or_text.to_s}_info",
+                                 :default => '',
+                                 :scope => [:activerecord, :attributes])
+          value = trans.blank? ? nil : trans
         else
           raise ArgumentError
         end
@@ -721,16 +696,6 @@ module KingForm
         else
           "#{@object_name}_#{name}"
         end
-      end
-
-      # Lookup a translation in gettext or i18n .. still used for enum values
-      # due to the namespacing and nesting in I18n the keys differ from gettext
-      def translation(i18n_key, gettext_key)
-        gettext_trans = _(gettext_key)
-        # return the gettext translation if found
-        return gettext_trans if gettext_key != gettext_trans
-        # else lookup i18n
-        I18n.translate(i18n_key)        
       end
 
     end #Class Base
