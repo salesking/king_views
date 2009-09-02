@@ -196,7 +196,7 @@ module KingForm
         choices = options.delete(:choices) || enum_values(fieldname) || []
         value   = options.delete(:value) || current_value(fieldname)
         options[:include_blank] = true unless options.has_key?(:include_blank)
-        options[:selected] ||= value.to_s
+        options[:selected] ||= value.is_a?(Array) ? value : value.to_s
 
         # Got an AR object so full automatic contruction should work
         if current_object.is_a?(ActiveRecord::Base) && fieldname.is_a?(Symbol)

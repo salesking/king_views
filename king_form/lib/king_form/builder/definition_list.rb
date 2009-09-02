@@ -80,7 +80,7 @@ module KingForm
           end
           @template.haml_tag(:td, tags.to_s, options)
         else
-          dt_tag(fieldname_or_title, options[:dt]) + dd_tag(tags.to_s, options[:dd])
+          @template.haml_concat dt_tag(fieldname_or_title, options[:dt]) + dd_tag(tags.to_s, options[:dd])
         end
       end
 
