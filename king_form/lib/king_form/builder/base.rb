@@ -39,12 +39,12 @@ module KingForm
       # A section is a group of related object information with name/value pairs,
       # like all dates of an object or the users name fields(last/first/title/nick).
       def section(title = nil, options = {}, &block)
-        #must be overwritten in ineritance
+        #must be overwritten in inerit classes
       end
 
       # Show multiple inputs as bundle
       def bundle(title = nil, options = {}, &block)
-      #must be redefined in subclass
+      #must be redefined in inerit class
       end
 
       # For using with nested forms with associated records => contact => addresses
@@ -60,8 +60,18 @@ module KingForm
       ##########################################################################
 
       # Generate input tag with title for text editing
-      # 1) text(:name)
-      # 2) text(:name, :title => 'Your Name:', :value => @the_name)
+      # ==== Example
+      # 1) text :name
+      # 2) text :name, :title => 'Your Name:', :value => @the_name, :size=>30, .maxlength=>35
+      # 
+      # ==== Parameter
+      # fieldname<Symbol, String>:: The field name of the current object
+      # options<Hash{Symbol=>Sting}:: Options to customize the output
+      # ==== Options
+      # :title => the title for the field
+      # :maxlength => the maxlength for the field, defaults to the columns limit
+      # :size => the size for the field, defaults to 25 or the columns minimun length
+      # :value => the value if it differs from th the fields value
       def text(fieldname, options={})
         title = options.delete(:title) || build_title(fieldname)
 
@@ -69,7 +79,6 @@ module KingForm
           if column = current_object.class.columns_hash[fieldname.to_s]
             # Limit the length of input to the column capacity
             options[:maxlength] ||= column.limit
-
             # Limit the displayed width to 25 (or to the column capacity, if smaller)
             options[:size] ||= [25, column.limit].min
           end
@@ -83,9 +92,9 @@ module KingForm
       # Generate hidden field tag
       # ==== Example
       # Default usage:
-      #   dl_form_for @email do |e|
-      #     e.hidden :some_token
-      #     => <input type='hidden' value='value of email.some_token' name=email[some_token]..>
+      #  - dl_form_for @email do |e|
+      #    = e.hidden :some_token
+      #  => <input type='hidden' value='value of email.some_token' name=email[some_token]..>
       # Custom fieldname passed in as string:
       #   e.hidden 'email[attachment_ids][]', value =>' '
       #  => <input type='hidden' value=' ' name='email[attachment_ids][]'..>
@@ -326,8 +335,10 @@ module KingForm
 
         if !options.delete(:nowrap) #wrap submit in span so button can be formated with css
           span_options = options.delete(:span) || {:class=>'input big'}
-          @template.haml_tag :span, span_options do
-            @template.haml_concat(super(value, options))
+          @template.capture_haml do
+            @template.haml_tag :span, span_options do
+              @template.haml_concat(super(value, options))
+            end
           end
         else #display field without span wrapping
           super value, options
@@ -367,18 +378,20 @@ module KingForm
       # also see #ListHelper
       #
       # ===Example haml
-      # f.actions do
-      #   my_actions
+      #   = f.actions do
+      #     = link_to my_actions
       #
       #  <div class="actions">my actions</div>
       #  <td class="actions">my actions</td>
       #
       def actions(options = {}, &block)
         options[:class] ||= 'actions'
-        if @config[:table]
-          @template.haml_tag :td, @template.capture_haml(&block), options
-        else
-          @template.haml_tag :div, @template.capture_haml(&block), options
+        @template.capture_haml do
+          if @config[:table]
+            @template.haml_tag :td, @template.capture_haml(&block), options
+          else
+            @template.haml_tag :div, @template.capture_haml(&block), options
+          end
         end
       end
 
@@ -391,38 +404,38 @@ module KingForm
         content = @template.capture_haml(&block)
 
         # Now build the whole table tag
-        result = @template.haml_tag :table, options.reverse_merge({ :summary => title }) do
-          @template.haml_tag :thead do
-            @template.haml_tag :tr do
-              @config[:column_header].each do |c|
-                c[:options][:class] ||= ''
-                if c == @config[:column_header].first
-                  c[:options][:class] << ' first'
-                elsif c == @config[:column_header].last
-                  c[:options][:class] << ' last'
-                end
+        result = @template.capture_haml do
+          @template.haml_tag :table, options.reverse_merge({ :summary => title }) do
+            @template.haml_tag :thead do
+              @template.haml_tag :tr do
+                @config[:column_header].each do |c|
+                  c[:options][:class] ||= ''
+                  if c == @config[:column_header].first
+                    c[:options][:class] << ' first'
+                  elsif c == @config[:column_header].last
+                    c[:options][:class] << ' last'
+                  end
 
-                @template.haml_tag :th, c[:title], c[:options]
+                  @template.haml_tag :th, c[:title], c[:options]
+                end
               end
             end
+            @template.haml_tag :tbody, content
           end
-          @template.haml_tag :tbody, content
         end
         @config[:table] = false
 
         return result
       end
 
-      #build a single table row
+      # Build a single table row
       def table_row(options = {}, &block)
         @config[:row_number] += 1
-        @template.haml_tag :tr, options do
-          @template.haml_concat @template.capture_haml(&block)
+        @template.capture_haml do
+          @template.haml_tag :tr, options do
+            @template.haml_concat @template.capture_haml(&block)
+          end
         end
-      end
-
-      def one_column(options = {}, &block)
-        @template.haml_concat @template.capture_haml(&block)
       end
 
      private
@@ -441,12 +454,6 @@ module KingForm
       # returns the class of the current object
       def current_class
         current_object.class
-      end
-
-      # returns the stringified and downcased class of the current object
-      #so it can be uses in id´s and name fields
-      def current_class_s
-        current_class.to_s.downcase
       end
 
       # returns the value of an attribute belonging to the current object
@@ -510,23 +517,7 @@ module KingForm
         else
           fieldname_or_title
         end
-      end
-
-      def dt_tag(fieldname_or_title, options = {})
-        fieldname_or_title.blank? ? "" : content_tag(:dt, build_title(fieldname_or_title), options)
-      end
-
-      #build a label tag
-      #TODO enhance with option <label for="fieldname">
-      def label_tag(fieldname_or_title, options = {})
-        fieldname_or_title.blank? ? "" : content_tag(:label, build_title(fieldname_or_title), options)
-      end
-
-      # build dd-tag
-      # Parameter "tags" may be a string or an array of strings
-      def dd_tag(tags, options = {})
-        tags.blank? ? '' : @template.content_tag(:dd, tags.to_s, options)
-      end
+      end      
 
       # Build span-tag with an info text after a field
       # ==== Parameter

@@ -5,9 +5,9 @@ module KingForm
       #
       # ====Example haml
       #  - dl_form_for(current_object) do |f|
-      #    - f.section _('legend.user.details') do
-      #      - f.text :first_name
-      #      - f.text :last_name
+      #    = f.section _('legend.user.details') do
+      #      = f.text :first_name
+      #      = f.text :last_name
       #
       # => # <fieldset>
       #       <legend>User Details</legend>
@@ -32,7 +32,7 @@ module KingForm
       # the semantic meaning of the html
       #
       #===Example haml
-      #    - f.section _('legend.user.details') do
+      #    = f.section _('legend.user.details') do
       #      = f.text :first_name
       #      = f.text :last_name
       #
@@ -46,7 +46,7 @@ module KingForm
       #       </dl>
       #      </fieldset>
       #
-      #    - f.section 'User', :class=>'settings', :dl=>{:class=>'left'}
+      #    = f.section 'User', :class=>'settings', :dl=>{:class=>'left'}
       #
       # => # <fieldset class='settings'>
       #       <legend>User</legend>
@@ -57,17 +57,24 @@ module KingForm
         # Only build the fieldset if the block is not empty (to ensure HTML validity)
         unless (content = @template.capture_haml(&block)).blank? # Performance??
           dl_options = options[:dl] || {}
-          @template.haml_tag :fieldset, options do
-            @template.haml_tag :legend, title unless title.blank?
-            @template.haml_tag :dl, content, dl_options
+          @template.capture_haml do
+            @template.haml_tag :fieldset, options do
+              @template.haml_tag :legend, title unless title.blank?
+              @template.haml_tag :dl, content, dl_options
+            end
           end
         end
       end
 
       # add titles to Input-Tag and embed/wrap in dt/dd
-      #   options: Hash with following keys
-      #     :dt => options for dt
-      #     :dd => options for dd
+      #
+      # ==== Parameter
+      # fieldname_or_title<Symbol, String>:: The fieldname to be used as the title in dt
+      # tags<String>:: a bunch of html/haml tags 
+      # options<Hash{Symbol=>String}>: Hash with following keys
+      # ==== Options:
+      #     :dt => options hash for dt
+      #     :dd => options hash for dd
       def tag_wrapper(fieldname_or_title, tags, options = {})
         if @config[:bundle] # called from "bundle" => dt/dd-wrapping is made outside
           @bundle_counter += 1
@@ -78,9 +85,11 @@ module KingForm
             @config[:column_header].push :title => build_title(fieldname_or_title),
                                          :options => { :align => options[:align] || 'left' }
           end
-          @template.haml_tag(:td, tags.to_s, options)
+          @template.capture_haml do
+            @template.haml_tag(:td, tags.to_s, options)
+          end
         else
-          @template.haml_concat dt_tag(fieldname_or_title, options[:dt]) + dd_tag(tags.to_s, options[:dd])
+          dt_tag(fieldname_or_title, options[:dt]) + dd_tag(tags.to_s, options[:dd])          
         end
       end
 
@@ -101,6 +110,17 @@ module KingForm
         else
           tag_wrapper(title, tags, :dt => options, :dd => { :class => "elements_#{@bundle_counter}" })
         end
+      end
+
+      # The definition type dt tag
+      def dt_tag(fieldname_or_title, options = {})
+        fieldname_or_title.blank? ? "" : content_tag(:dt, build_title(fieldname_or_title), options)
+      end
+
+      # Build dd-tag
+      # Parameter "tags" may be a string or an array of strings
+      def dd_tag(tags, options = {})
+        tags.blank? ? '' : content_tag(:dd, tags.to_s, options)
       end
 
     end

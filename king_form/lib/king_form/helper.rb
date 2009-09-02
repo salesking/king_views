@@ -29,14 +29,12 @@ module KingForm
     def dl_form_for(record_or_name_or_array, *args, &proc)
       options = args.last.is_a?(Hash) ? args.pop : {}
       options[:builder] = KingForm::Builder::DefinitionList
-
       form_for(record_or_name_or_array, *(args << options), &proc)
     end
 
     def dl_fields_for(record_or_name_or_array, *args, &block)
       options = args.last.is_a?(Hash) ? args.pop : {}
       options[:builder] =  KingForm::Builder::DefinitionList
-
       fields_for(record_or_name_or_array, *(args << options), &block)
     end
 
@@ -77,7 +75,6 @@ module KingForm
     def labeled_fields_for(record_or_name_or_array, *args, &block)
       options = args.last.is_a?(Hash) ? args.pop : {}
       options[:builder] =  KingForm::Builder::Labeled
-
       fields_for(record_or_name_or_array, *(args << options), &block)
     end
 

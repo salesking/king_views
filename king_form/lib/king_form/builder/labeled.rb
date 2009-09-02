@@ -53,11 +53,12 @@ module KingForm
         raise ArgumentError if title && !title.is_a?(String)
 
         # Only build the fieldset if the block is not empty (to ensure HTML validity)
-        unless (content = @template.capture_haml(&block)).blank?
-
-          @template.haml_tag :fieldset, options do
-            @template.haml_tag :legend, title unless title.blank?
-            @template.haml_concat content
+        unless (content = @template.capture_haml(&block)).blank? # performance ??
+          @template.capture_haml do
+            @template.haml_tag :fieldset, options do
+              @template.haml_tag :legend, title unless title.blank?
+              @template.haml_concat content
+            end
           end
         end
       end
@@ -81,11 +82,12 @@ module KingForm
       #
       # ==== Parameter
       # fieldname_or_title<String Symbol>:: The title for the field
-      # tags<String>:: haml html tags
-      # options<Hash{Symbold=>String}>::
-      #     :label => options for label
-      #     :div => options for surounding div
-      #     :align => alignment in table
+      # tags<String>:: html tags as string
+      # options<Hash{Symbold=>String}>:: options for the surrounding html
+      # ==== Options
+      # :label => options for label
+      # :div => options for surrounding div
+      # :align => alignment in table
       def tag_wrapper(fieldname_or_title, tags, options = {})
         if @config[:bundle]
           @bundle_counter += 1
@@ -96,19 +98,25 @@ module KingForm
             @config[:column_header].push :title => build_title(fieldname_or_title),
                                          :options => { :align => options[:align] || 'left' }
           end
-          @template.haml_tag(:td, tags, options)
-        else
-          @template.haml_tag :div do
-            if tags.match /checkbox/
-              # wrap only checkbox tag into to label, so it is clickable
-              @template.haml_concat label_tag(fieldname_or_title + tags, options[:label])
-            else
-              # other tags stay outside label tag, because they don't like to be wrapped sometimes
-              @template.haml_concat label_tag(fieldname_or_title, options[:label]) + tags
-            end
+          @template.capture_haml do
+            @template.haml_tag(:td, tags, options)
           end
+        else
+          out = if tags.match /checkbox/ # wrap only checkbox tag into to label, so it is clickable
+                  label_tag(fieldname_or_title + tags, options[:label])
+                else # other tags stay outside label tag, because they don't like to be wrapped sometimes
+                  label_tag(fieldname_or_title, options[:label]) + tags
+                end
+          content_tag(:div, out)
         end
       end
-    end
+
+      # Build a label tag
+      #TODO enhance with option <label for="fieldname">
+      def label_tag(fieldname_or_title, options = {})
+        fieldname_or_title.blank? ? "" : content_tag(:label, build_title(fieldname_or_title), options)
+      end
+
+    end # labeled class
   end #module
 end#module
