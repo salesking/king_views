@@ -11,7 +11,7 @@ module KingForm
     #  -dl_form_for(:client, :url => object_url, :html => { :method => :put }) do |f|
     #    - f.section 'Client Details' do
     #      = f.text :number
-    #      = f.bundle 'Gender/Title' do
+    #      - f.bundle 'Gender/Title' do
     #        = f.selection :gender
     #        = f.text :title, :class => 'medium'
     #      = f.text :position
@@ -48,7 +48,7 @@ module KingForm
     #  -labeled_form_for(:client, :url => object_url, :html => { :method => :put }) do |f|
     #    - f.section 'Client Details' do
     #      = f.text :number
-    #      = f.bundle 'Gender/Title' do
+    #      - f.bundle 'Gender/Title' do
     #        = f.text :gender
     #        = f.text :title, :class => 'medium'
     #   # =><form ...>

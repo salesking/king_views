@@ -51,21 +51,15 @@ module KingForm
       #
       def section(title = nil, options = {}, &block)
         raise ArgumentError if title && !title.is_a?(String)
-
-        # Only build the fieldset if the block is not empty (to ensure HTML validity)
-        unless (content = @template.capture_haml(&block)).blank? # performance ??
-          @template.capture_haml do
-            @template.haml_tag :fieldset, options do
-              @template.haml_tag :legend, title unless title.blank?
-              @template.haml_concat content
-            end
-          end
+        @template.haml_tag :fieldset, options do
+          @template.haml_tag :legend, title unless title.blank?
+          @template.haml_concat( @template.capture_haml(&block) )
         end
       end
 
       # Show multiple inputs in one line (div tag)
       # === Example haml
-      # = f.bundle _('Gender and Title') do
+      # - f.bundle _('Gender and Title') do
       #   = f.selection :gender
       #   = f.text :title, :medium
       # ==== Parameter
@@ -75,7 +69,7 @@ module KingForm
         @bundle_counter = 0
         tags = @template.capture(&block)
         @config[:bundle] = false
-        tag_wrapper(title, tags, options)
+        @template.concat( tag_wrapper(title, tags, options) )
       end
 
       # Add titles/labels to input tag and wrap in div
@@ -107,7 +101,7 @@ module KingForm
                 else # other tags stay outside label tag, because they don't like to be wrapped sometimes
                   label_tag(fieldname_or_title, options[:label]) + tags
                 end
-          content_tag(:div, out)
+          "<div> #{out}</div>"
         end
       end
 

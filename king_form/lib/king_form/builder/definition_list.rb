@@ -53,15 +53,11 @@ module KingForm
       #       <dl class='left'>
       def section(title = nil, options = {}, &block)
         raise ArgumentError if title && !title.is_a?(String)
-
-        # Only build the fieldset if the block is not empty (to ensure HTML validity)
-        unless (content = @template.capture_haml(&block)).blank? # Performance??
-          dl_options = options[:dl] || {}
-          @template.capture_haml do
-            @template.haml_tag :fieldset, options do
-              @template.haml_tag :legend, title unless title.blank?
-              @template.haml_tag :dl, content, dl_options
-            end
+        dl_options = options[:dl] || {}
+        @template.haml_tag :fieldset, options do
+          @template.haml_tag :legend, title unless title.blank?
+          @template.haml_tag :dl, dl_options do
+            @template.haml_concat( @template.capture_haml(&block) )
           end
         end
       end
@@ -85,7 +81,7 @@ module KingForm
             @config[:column_header].push :title => build_title(fieldname_or_title),
                                          :options => { :align => options[:align] || 'left' }
           end
-          @template.capture_haml do
+          @template.capture_haml do #MUST return as string
             @template.haml_tag(:td, tags.to_s, options)
           end
         else
@@ -95,7 +91,7 @@ module KingForm
 
       # Show multiple inputs in one line (dd tag)
       # === Example haml
-      # = f.bundle _('Gender and Title') do
+      # - f.bundle _('Gender and Title') do
       #   = f.selection :gender
       #   = f.text :title, :medium
       #
@@ -104,12 +100,7 @@ module KingForm
         @bundle_counter = 0
         tags = @template.capture(&block)
         @config[:bundle] = false
-
-        if @config[:table]
-          tag_wrapper(title, tags)
-        else
-          tag_wrapper(title, tags, :dt => options, :dd => { :class => "elements_#{@bundle_counter}" })
-        end
+        @template.concat( @config[:table] ? tag_wrapper(title, tags) : tag_wrapper(title, tags, :dt => options, :dd => { :class => "elements_#{@bundle_counter}" }) )
       end
 
       # The definition type dt tag

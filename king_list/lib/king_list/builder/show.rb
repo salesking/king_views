@@ -60,8 +60,10 @@ module KingList
         caption = '&nbsp;' if caption.blank?
         value = '&nbsp;' if value.blank?
 
-        @template.haml_tag :dt, caption, options
-        @template.haml_tag :dd, value, options
+        @template.capture_haml do
+          @template.haml_tag :dt, caption, options
+          @template.haml_tag :dd, value, options
+        end
       end
     
     end #class

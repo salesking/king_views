@@ -1,5 +1,7 @@
 require "#{File.dirname(__FILE__)}/king_form/helper"
 require "#{File.dirname(__FILE__)}/king_form/overrides"
+require "#{File.dirname(__FILE__)}/king_form/builder/form_fields_overrides"
+require "#{File.dirname(__FILE__)}/king_form/builder/form_fields"
 require "#{File.dirname(__FILE__)}/king_form/builder/base"
 require "#{File.dirname(__FILE__)}/king_form/builder/definition_list"
 require "#{File.dirname(__FILE__)}/king_form/builder/labeled"

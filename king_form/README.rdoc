@@ -1,24 +1,33 @@
-KingForm
-==========
+= KingForm
+
 Writing forms is is an enerving repetitive task. It already got easier through rails
-but still you have to huddle with a lot of html, erb markup around your fields.
+but still you have to huddle with a lot of html, erb markup and options around your fields.
 
 King forms internals are based on haml, rails' form helpers, I18n translations
 and a simplified syntax for fieldnames.
 
 Additionally it includes a nested_form_helper to easiely show related models in a form.
 
-
-== Example erb
-
-== Example haml
-
 == Example KingForm
+ruby code
+ - dl_form_for( current_object, :url => object_url, :html => { :id => 'productForm'} ) do |f|
+  - f.section 'Name & Number' do
+    = f.hidden :lock_version
+    = f.text :name, :class => 'required'
+    = f.text :number
+    = f.selection :category
+    = f.selection :quantity_unit, :choices => ['some', 'choices']
+  - f.section '' do
+    = f.selection :tax, :choices => ['tax1', 'tax2'], :include_blank => false
+    = f.text :price, :class => 'required'
+    - f.actions do
+      = f.submit t(:'form.save')
+      = link_to t(:'link.cancel'), object_path
 
 == Example Nested Forms
 
 The first thing you need to do is enable attributes on the association in the model.
-  
+ruby code
   class Project < ActiveRecord::Base
     has_many :tasks
     accepts_nested_attributes_for :tasks

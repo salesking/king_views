@@ -1,0 +1,19 @@
+= KingList
+
+King List provides helpers to be used in table listings and detail views.
+It has function for action icons, buttons, actions links and icons with hidden
+forms used to simulate PUT or DELETE requests
+
+== Example
+A tabled view
+  - table_for(@object) do
+    = t.column :firstname
+    = t.column :lastname, :sorting=>false
+
+A definition list view
+  - dl_for current_object do |f|
+    = f.show :creator
+    = f.show :created_at
+    = f.show :updated_at
+
+Copyright (c) 2009 Georg Leciejewski, released under the MIT license

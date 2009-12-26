@@ -248,8 +248,10 @@ module KingList
     #   </form>
     #
     def action_button(fieldname, options)
-      haml_tag :li, :class=>'form_btn' do
-        haml_concat mini_action_form(fieldname, options)
+      @template.capture_haml do
+        haml_tag :li, :class=>'form_btn' do
+          haml_concat mini_action_form(fieldname, options)
+        end
       end
     end
     def action_link(fieldname, options)
@@ -308,11 +310,13 @@ module KingList
     # Internal method used by action_text, action_button and action_icon
     # Directly returns a haml string into the template
     def action(kind, name_or_title, link_options, li_options={}, html_options={})
-      haml_tag :li, li_options do
-        case kind
-          when :icon   then haml_concat link_to('', link_options, html_options)
-          when :text   then haml_concat link_to(name_or_title, link_options, html_options)
-          when :button then haml_concat button_to(name_or_title, link_options)
+      @template.capture_haml do
+        haml_tag :li, li_options do
+          case kind
+            when :icon   then haml_concat link_to('', link_options, html_options)
+            when :text   then haml_concat link_to(name_or_title, link_options, html_options)
+            when :button then haml_concat button_to(name_or_title, link_options)
+          end
         end
       end
     end

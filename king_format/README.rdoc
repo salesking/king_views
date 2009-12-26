@@ -1,0 +1,20 @@
+= KingFormat
+KingFormat consists of two different formatting helper regions:
+
+== Model
+Define fields being of type date, money or percent.  When the fields are shown in the
+views, their format is detected and the output is looking nice.
+
+== View & Helper
+Output any model value through the function formatted_value() to ensure a consistent output.
+
+There are select values for money-symbols and date formatting.
+
+
+== Example
+In a Model
+  has_money_fields :amount
+  has_date_fields :subscription_start
+  has_percent_fields :tax
+
+Copyright (c) 2009 Georg Leciejewski, released under the MIT license
