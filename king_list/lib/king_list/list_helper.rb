@@ -147,6 +147,10 @@ module KingList
     # Show a list of options as ul / li list.
     # Each actions li gets a special class so image replacement can be done via css
     # ==== Example
+    #  - action_group do
+    #    = action_icon :edit, edit_object_path(client)
+    #    = action_icon :invoice_add, new_client_invoice_path(client), :title => 'New Invoice'
+    #     = action_text t(:'web_templates.new'), new_object_path,{},{ :class=>'btn_add'}
     # # <ul class="actions">
     #    <li class="button delete">
     #     <a href="delete/id">delete</a>

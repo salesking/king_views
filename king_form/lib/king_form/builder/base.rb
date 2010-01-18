@@ -29,6 +29,7 @@ module KingForm
     class Base < ActionView::Helpers::FormBuilder
       include KingForm::Builder::FormFields
       include KingForm::Builder::FormFieldsOverrides
+      attr_accessor :no_wrap
       def initialize(object_name, object, template, options, proc)
         # Store builder configuration data (only used by "render_associated_form")
         @config = options.delete(:config) || {}

@@ -223,7 +223,12 @@ module KingForm
 
       def checkbox(fieldname, options={})
         title = options.delete(:title) || build_title(fieldname)
-        tag_wrapper title, check_box(fieldname, options)
+        if current_object.is_a?(ActiveRecord::Base) && fieldname.is_a?(Symbol)
+          tag_wrapper title, check_box(fieldname, options)
+        else # not an AR object, or a custom field
+#          value =  # defaults to 1
+          tag_wrapper title, check_box_tag(fieldname, options.delete(:value), options.delete(:checked), options)
+        end
       end
 
       def radio(fieldname, tag_value, options={})

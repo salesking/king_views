@@ -4,7 +4,7 @@ module KingForm
     # Modified core html tag methods.
     # Because they should not be called direct, they are made private...
     module FormFieldsOverrides
-    private
+#    private
       def text_field(method, options = {})
         options[:class] = (options[:class] || '')  + ' text'
         info_text = options.delete(:info)
@@ -99,18 +99,25 @@ module KingForm
         @template.file_field_tag(name, options) + info_tag(info_text || ''  )
       end
 
-      def text_area_tag(name, value, options = {})
+      def text_area_tag(name, value, opts = {})
         options[:size] ||= "20x3" # sized needed for valid html
         options[:id] ||= build_id(name)
         info_text = options.delete(:info)
-
-        @template.text_area_tag("#{@object_name}[#{name}]", value, options) + info_tag(info_text || name)
+        @template.text_area_tag("#{@object_name}[#{name}]", value, opts) + info_tag(info_text || name)
       end
 
-      def check_box_tag(name, value = "1", checked = false, options = {})
-        options[:id] ||= build_id(name)
-        info_text = options.delete(:info)
-        @template.check_box_tag("#{@object_name}[#{name}]", value, checked, options) + info_tag(info_text || name)
+      def check_box_tag(name, value = "1", checked = false, opts = {})
+        if name.is_a?(Symbol)
+          opts[:id] ||= build_id(name)
+          infos = info_tag( opts.delete(:info) || name) # build info tag, cause info_tag(:symbol) is looking into I18n transl
+          #now set real name as string
+          name = "#{@object_name}[#{name}]"
+        else
+          opts[:id] ||= nil
+          info_text = opts.delete(:info)
+          infos = info_text ? info_tag( info_text) : ''
+        end
+        @template.check_box_tag(name, value, checked, opts) + infos
       end
 
       # Overriden rails select_tag
@@ -129,11 +136,11 @@ module KingForm
       # opts<Hash{Symbol=>String}>:: Rails select_tag options + :info
       def select_tag(name, option_tags = nil, opts = {})
         if name.is_a?(Symbol)
-          name = "#{@object_name}[#{name}]" # contruct the fieldname
           opts[:id] ||= build_id(name)   #construct id
-          infos = info_tag( opts.delete(:info) || name)  # build info tag
+          infos = info_tag( opts.delete(:info) || name) # build info tag, cause info_tag(:symbol) is looking into I18n transl
+          name = "#{@object_name}[#{name}]" # contruct the fieldname
         else
-          opts[:id] ||= false
+          opts[:id] ||= nil
           info_text = opts.delete(:info)
           infos = info_text ? info_tag( info_text) : ''
         end
