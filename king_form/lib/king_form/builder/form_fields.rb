@@ -155,6 +155,8 @@ module KingForm
 
         # Got an AR object so full automatic contruction should work
         if current_object.is_a?(ActiveRecord::Base) && fieldname.is_a?(Symbol)
+          # try to sort by key f.ex. when transl. enum_fields
+          choices = choices.to_a.sort_by{|k|k} if choices.is_a?(Hash)
           tag_wrapper title, select(fieldname, choices, options, html_options)
         else # a custom object
            # got an array of sub-arrays[[key,val]] or an array of strings(key==val)
@@ -172,6 +174,8 @@ module KingForm
             option_tags = @template.options_for_select(choices, options.delete(:selected))
             tag_wrapper title, select_tag(fieldname, option_tags, options.merge(html_options))
           else #Choices of AR Objects, value is the Obj id, shown value is the object.to_s
+#            choices = choices.sort_by{|k, v|v.to_s} # sorty by object as string
+            choices = choices.sort_by{|k| k.to_s} # sorty by object as string
             tag_wrapper title, collection_select(fieldname, choices, :id, :to_s, options, html_options)
           end
         end

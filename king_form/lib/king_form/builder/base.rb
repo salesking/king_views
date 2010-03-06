@@ -157,6 +157,8 @@ module KingForm
       # "activerecord.attributes.client.enum.sending_methods.email"
       # ==== Parameter
       # fieldname<String,Symbol>:: The fieldname in the model which holds enum values from acts_as_enum plugin
+      # === Returns
+      # <Hash{'translated fldname'=>'value'}>::
       def enum_values(fieldname)
         # Check if there is a const in the class defined by acts_as_enum
         return unless current_class.const_defined?(fieldname.to_s.upcase)
