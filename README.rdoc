@@ -29,20 +29,20 @@ Clean up your forms with helpers in rails haml views, with support for:
 * based on rails action view helpers so all parameters are passed through(nearly all) to the original versions
 
 === Example
-- dl_form_for @payment, :url => 'a path', :html => { :method => :post } do |f|
-  -f.section do
-    = f.hidden :lock_version
-    = f.text :amount, :class => 'required', :value=> 'a custom val'
-    = f.date :date
-    = f.selection :payment_method
-    - f.bundle 'status' do
-      = f.radio :new_status, :closed, :checked=>true
-      %span=t(:'status.closed')
-      = f.radio :new_status, :open
-      %span= t(:'activerecord.attributes.document.enum.status.open')
-  -f.actions do
-    = f.submit t(:'form.save')
-    = secondary_link_to t(:'link.cancel'), parent_path
+    - dl_form_for @payment, :url => 'a path', :html => { :method => :post } do |f|
+      -f.section do
+        = f.hidden :lock_version
+        = f.text :amount, :class => 'required', :value=> 'a custom val'
+        = f.date :date, :title => t(:'from'), :info=>'Help me'
+        = f.selection :payment_method
+        - f.bundle 'status' do
+          = f.radio :new_status, :closed, :checked=>true
+          %span=t(:'status.closed')
+          = f.radio :new_status, :open
+          %span= t(:'activerecord.attributes.document.enum.status.open')
+      -f.actions do
+        = f.submit t(:'form.save')
+        = secondary_link_to t(:'link.cancel'), parent_path
 
 == KingList
 
