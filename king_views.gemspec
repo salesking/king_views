@@ -10,13 +10,16 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Georg Leciejewski"]
   s.date = %q{2010-04-16}
-  s.description = %q{Clean up your Forms using king_form for dl or labeled translated, . Use king_list for an easy markup of tables in your lists and dl-enabled listings in your detail views. }
+  s.description = %q{Clean up your Forms using king_form for dl or labeled forms. Use king_list for an easy markup of tables in your lists and dl-enabled listings in your detail views. }
   s.email = %q{gl@salesking.eu}
   s.extra_rdoc_files = [
     "README.rdoc"
   ]
   s.files = [
-    "README.rdoc",
+    "MIT-LICENSE",
+     "README.rdoc",
+     "Rakefile",
+     "VERSION",
      "init.rb",
      "king_form/MIT-LICENSE",
      "king_form/README.rdoc",
@@ -60,25 +63,23 @@ Gem::Specification.new do |s|
      "king_list/lib/king_list/overrides.rb",
      "king_list/tasks/king_list_tasks.rake",
      "king_list/test/king_list_test.rb",
-     "king_list/test/test_helper.rb"
+     "king_list/test/test_helper.rb",
+     "king_views.gemspec"
   ]
-  s.homepage = %q{http://github.com/salesking/king_hmac}
+  s.homepage = %q{http://github.com/salesking/king_views}
   s.rdoc_options = ["--charset=UTF-8"]
   s.require_paths = ["lib"]
   s.rubygems_version = %q{1.3.6}
-  s.summary = %q{Ultraclean haml views, list and forms for rails}
+  s.summary = %q{Ultraclean haml views with list and forms helpers for rails}
 
   if s.respond_to? :specification_version then
     current_version = Gem::Specification::CURRENT_SPECIFICATION_VERSION
     s.specification_version = 3
 
     if Gem::Version.new(Gem::RubyGemsVersion) >= Gem::Version.new('1.2.0') then
-      s.add_development_dependency(%q<rspec>, [">= 0"])
     else
-      s.add_dependency(%q<rspec>, [">= 0"])
     end
   else
-    s.add_dependency(%q<rspec>, [">= 0"])
   end
 end
 
