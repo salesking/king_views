@@ -5,6 +5,8 @@ It has function for action icons, buttons, actions links and icons with hidden
 forms used to simulate PUT or DELETE requests
 
 == Example
+Please read the files in lib/  for further documentation and examples
+
 A tabled view
   - table_for(@object) do
     = t.column :firstname

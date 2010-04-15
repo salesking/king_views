@@ -1,0 +1,84 @@
+= KingViews
+
+This is the new offical home of KingViews(forked from schorsch)
+
+KingViews where extracted from SalesKing(https://www.SalesKing.eu) and consist 
+of three different view helpers, KingForm( dl || labeled forms, enhanced inputs ),
+KingList( dl, tables ) and KingFormat( date, money, percent )
+
+This stuff is not optimized(yet) to run seamlessly within any rails project.
+Fixes for rails 2.3.5 and of course 3.0 are needed. Some refacturing and of
+course testing(still stuck in SalesKing) should be done, leaving space for forks.
+
+== Install
+
+You must use HAML for your views .. the cure for erb eye cancer
+
+    gem install king_views
+
+
+== KingForm
+
+Clean up your forms with helpers in rails haml views, with support for:
+* dl or labeled forms
+* shorter syntax for inputs
+* fieldset support (section)
+* labels auto translated when present in I18n or Gettext
+* info-text for auto translated info after each input
+* bundle a couple of inputs under one label or dt incl. css class based counter for the wrapper
+* based on rails action view helpers so all parameters are passed through(nearly all) to the original versions
+
+=== Example
+- dl_form_for @payment, :url => 'a path', :html => { :method => :post } do |f|
+  -f.section do
+    = f.hidden :lock_version
+    = f.text :amount, :class => 'required', :value=> 'a custom val'
+    = f.date :date
+    = f.selection :payment_method
+    - f.bundle 'status' do
+      = f.radio :new_status, :closed, :checked=>true
+      %span=t(:'status.closed')
+      = f.radio :new_status, :open
+      %span= t(:'activerecord.attributes.document.enum.status.open')
+  -f.actions do
+    = f.submit t(:'form.save')
+    = secondary_link_to t(:'link.cancel'), parent_path
+
+== KingList
+
+Use KingList for an easy markup inside your lists and detail views. Its not as
+extensive as KingForm and only provides the following:
+
+* easy to use tables for listings
+* dl-helper for detail views
+* action_icons & action_buttons(forms) for css enabled icon markup
+
+=== Example
+    # Definition list for detail views
+    - dl_for @invoice do |f|
+      = f.show :number
+      = f.show :date # auto-formated date field
+      = f.show :total # auto-formated money field
+
+    # table with header-klick sorting disabled
+    - table_for(@payments,{:sorting => false} ) do |t, payment|
+      - t.action_column do
+        = action_button 'delete', {:url=> 'some-path', :title => t(:'link.delete'), :method => :delete, :class=>'delete'}
+      = t.column :date
+      = t.column :amount, :td_options => {opt=>val}
+
+== KingFormat
+Provides a semi-automatic formatting of date, money, percent fields. The field
+types are defined inside a model. And the view helpers will show a nice output.
+
+=== Example:
+
+    #define date fields you model definition
+    class Invoice < ActiveRecord::Base
+      has_date_fields :date, :valid_until
+      has_money_fields :total, :price
+    end
+    # see above for usage in views
+
+== License
+Copyright (c) 2009 Georg Leciejewski, released under the MIT-LICENSE
