@@ -64,7 +64,8 @@ Gem::Specification.new do |s|
      "king_list/tasks/king_list_tasks.rake",
      "king_list/test/king_list_test.rb",
      "king_list/test/test_helper.rb",
-     "king_views.gemspec"
+     "king_views.gemspec",
+     "lib/king_views.rb"
   ]
   s.homepage = %q{http://github.com/salesking/king_views}
   s.rdoc_options = ["--charset=UTF-8"]
