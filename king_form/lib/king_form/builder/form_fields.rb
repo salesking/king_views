@@ -252,55 +252,6 @@ module KingForm
         end
       end
 
-      # Create a submit button
-      # due to better formating the default button call is wrapped in a span.
-      #
-      # === Example (haml)
-      # - f.actions do
-      #   = f.submit t('form.save')
-      #
-      #   = f.submit "save", :span => {:class=>'custom class'}
-      #
-      #   = f.submit 'Submit Me', :name => 'save', nowrap=>true
-      #   = f.submit t('form.save'), :name => 'refresh', nowrap=>true
-      #   = f.submit 'Print', :name => 'print', :class=>'print, nowrap=>true
-      #
-      # => <div class="actions">
-      #       <span class='input big'>
-      #         <input id="invoice_save" class="submit" type="submit" value="Save" name="save" />
-      #       </span>
-      #
-      #       <span class='custom class'>
-      #         <input id="invoice_save" class="submit" type="submit" value="Save" name="save" />
-      #       </span>
-      #
-      #       <input id="invoice_save" class="submit" type="submit" value="Speichern" name="save" />
-      #       <input id="invoice_refresh" class="submit" type="submit" value="Aktualisieren" name="refresh" />
-      #       <input id="invoice_print" class="print" type="submit" value="Print" name="print" />
-      #     </div>
-      #
-      #===Params
-      #Options Hash:
-      # :name is only needed if you have more than one button on the form
-      # :id is calculated based on the :name
-      # :class defaults to "submit"
-      def submit(value, options = {})
-        options[:id] ||= build_id(options[:name] || 'submit')
-        options[:class] ||= 'submit'
-
-        if !options.delete(:nowrap) #wrap submit in span so button can be formated with css
-          span_options = options.delete(:span) || {:class=>'input big'}
-          @template.capture_haml do
-            @template.haml_tag :span, span_options do
-              @template.haml_concat(super(value, options))
-            end
-          end
-        else #display field without span wrapping
-          super value, options
-        end
-      end
-
-
       # Display a fields value as static text
       #
       # === Example haml
