@@ -30,7 +30,8 @@ module KingFormat
     def formatted_value(object, fieldname, value=nil, opts={})
       # If no value given, call fieldname on object to get the current value
       value ||= if object.respond_to?(fieldname)
-        object.send(fieldname) || '' #return the content or if no content an empty string
+        #return the content(a pointer it) or an empty string.
+        object.send(fieldname) || ''
       else #field is not available in object
         nil
       end
@@ -38,7 +39,6 @@ module KingFormat
       # Autodetect value type
       if value.nil?
         nil
-
       elsif value.is_a?(Symbol) # enum value from acts_as_enum
         translated_enum_value(object, fieldname, value)
       elsif value.is_a?(DateTime) || value.is_a?(Time)  #|| value.is_a?(Date)
@@ -58,28 +58,32 @@ module KingFormat
         number_to_currency(value, settings.merge({:locale => I18n.locale}))
       elsif ( value.is_a?(Date) || (object.class.is_date_field?(fieldname) rescue nil) || opts[:date] ) #field is defined as date field OR date options are passed in
         return value if value.blank? # blank value can occur when a is_date_field is empty
-          # get date from opts or company or fallback into i18n
-          format = opts[:date] || default_date_format
-          format.blank? ? ::I18n.localize(value) : value.strftime(format)
+        # get date from opts or company or fallback into i18n
+        format = opts[:date] || default_date_format
+        format.blank? ? ::I18n.localize(value) : value.strftime(format)
       else
        if opts[:format] == :html
           # Change HTML tag characters to entities
           ERB::Util.html_escape(value)
         else
-          value
+          #Copy->val.dup because obj.send(fieldname) returns pointer, and subsequent calls
+          #may then alter the real value f.ex val = formatted_value(yx) + "info text"
+          value.blank? ? value : value.dup
         end
       end
     end #formatted
 
     # Returns the default date formatting.
     # The returned string is passed to strftime(format)
+    # TODO: NoGo since one cannot expect a company to be present
     # === Returns
     # <String>:: strftime compatible string
     def default_date_format
       Company.current.date_format rescue nil
     end
 
-    # Returns the default currency formatting.
+    # Returns the default currency formatting from Company.current => Thread var
+    # TODO: NoGo since one cannot expect a company to be present
     # The returned hash is used in rails number_to_currency helper
     # === Returns
     # <Hash>:: number_to_currency compatible options hash

@@ -262,7 +262,6 @@ module KingForm
         if fieldname.is_a?(Hash) && options.empty? # Short call without fieldname
           options = fieldname
           fieldname = nil
-
           # Value and title are needed
           raise ArgumentError unless options[:title]
           raise ArgumentError unless options[:value]
