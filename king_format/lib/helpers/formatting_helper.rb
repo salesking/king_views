@@ -68,7 +68,8 @@ module KingFormat
         else
           #Copy->val.dup because obj.send(fieldname) returns pointer, and subsequent calls
           #may then alter the real value f.ex val = formatted_value(yx) + "info text"
-          value.blank? ? value : value.dup
+          # rescue for Fixnums are not dup -able, cause its a call by value
+          value.blank? ? value : ( value.dup rescue value )
         end
       end
     end #formatted
