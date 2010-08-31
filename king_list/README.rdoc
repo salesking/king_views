@@ -1,21 +1,37 @@
 = KingList
 
-King List provides helpers to be used in table listings and detail views.
-It has function for action icons, buttons, actions links and icons with hidden
-forms used to simulate PUT or DELETE requests
+King List provides helpers for table listings and detail views.
+It has function to create list(ul) with action icons(li+hidden a), buttons,
+actions links(li+a) and icons with hidden forms used to simulate PUT or DELETE
+requests.
+All of those output ul->li->a structure with some css classes, so they need to be
+formated via css (Examples follow, see salesking.eu for now).
 
-== Example
+You also get automatic lookup of translations (I18n) for active record objects and
+their fields.
+
+== Examples
 Please read the files in lib/  for further documentation and examples
 
-A tabled view
-  - table_for(@object) do
+Build a table for an array of AR objects
+  - table_for(@ar_objects) do |t, obj|
     = t.column :firstname
     = t.column :lastname, :sorting=>false
+    = t.column :number, :link=>true # links content to the object
+    = t.column :email, :value=>"custom content #{obj.email}", :title=>'custom th'
+    = t.column :created_at, :class=>'rgt', :sort_fields=>'users.updated_at,users.created_at'
 
 A definition list view
   - dl_for current_object do |f|
     = f.show :creator
     = f.show :created_at
     = f.show :updated_at
+
+== Dependencies
+
+* haml
+* activerecord
+* I18n
+* king_format(included in this gem)
 
 Copyright (c) 2009 Georg Leciejewski, released under the MIT license

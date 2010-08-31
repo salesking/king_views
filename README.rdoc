@@ -28,6 +28,8 @@ Clean up your forms with helpers in rails haml views, with support for:
 * bundle a couple of inputs under one label or dt incl. css class based counter for the wrapper
 * based on rails action view helpers so all parameters are passed through(nearly all) to the original versions
 
+Also see README in KingForm: http://github.com/salesking/king_views/tree/master/king_form/
+
 === Example
     - dl_form_for @payment, :url => 'a path', :html => { :method => :post } do |f|
       -f.section do
@@ -53,23 +55,29 @@ extensive as KingForm and only provides the following:
 * dl-helper for detail views
 * action_icons & action_buttons(forms) for css enabled icon markup
 
-=== Example
+Also see README in KingList: http://github.com/salesking/king_views/tree/master/king_list/
+
+=== Quick Example
+
     # Definition list for detail views
     - dl_for @invoice do |f|
       = f.show :number
-      = f.show :date # auto-formated date field
-      = f.show :total # auto-formated money field
+      = f.show :date # auto-formated date field see KingFormat
+      = f.show :total # auto-formated money field see KingFormat
 
-    # table with header-klick sorting disabled
+    # table with header-klick sorting disabled and icons in first column
     - table_for(@payments,{:sorting => false} ) do |t, payment|
       - t.action_column do
+        = action_icon :edit, edit_payment_path(payment)
         = action_button 'delete', {:url=> 'some-path', :title => t(:'link.delete'), :method => :delete, :class=>'delete'}
       = t.column :date
       = t.column :amount, :td_options => {opt=>val}
 
 == KingFormat
 Provides a semi-automatic formatting of date, money, percent fields. The field
-types are defined inside a model. And the view helpers will show a nice output.
+types are defined inside each model. And the view helpers will show a nice output.
+
+Also see README http://github.com/salesking/king_views/tree/master/king_format/
 
 === Example:
 
