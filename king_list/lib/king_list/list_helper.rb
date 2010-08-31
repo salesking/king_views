@@ -43,7 +43,7 @@ module KingList
     # generates a fieldset with optional legend
     #
     # === Example haml
-    #  - section :caption => _('legend.user.details'), :class => 'my_css_class' do
+    #  - section :caption => t('legend.user.details'), :class => 'my_css_class' do
     #    %p= "This is the content"
     #
     # => # <fieldset>

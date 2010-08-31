@@ -21,7 +21,7 @@ module KingList
       # options<Hash{Hash, Symbol=>String}>:: A bunch of options to customize the th, td or content of the column
       #
       # ==== Options hash:
-      #   :object   => The record to use. If not set the current_object is used
+      #   :object   => The record to use. If not set, the current_object is used
       #   :value    => cell content (if not set, it will be determined by calling field_name on object/current_record) => @client.name
       #   :link     => if set, the value is wrapped in a link_to with the given link (if TRUE, the current object is used)
       #   :row_link => if set, the value is wrapped in a link_to with the given link (if TRUE, the current object is used)
@@ -32,7 +32,7 @@ module KingList
       #       :class:: the class to set on the th
       #   :td_options{Symbol=>String}:: options for the <td>
       #     :class:: the class to set on the th
-      #   :align    => classes used for alignment. Values are :left or :right
+      #   :class    => class as Symbol or String used on TH and TD used f.ex. for alignment.
       def column(field_name, options = {})
         options = options.deep_clone # for not changing outer variable
         th_options = options[:th_options] || {}
@@ -41,10 +41,11 @@ module KingList
         # Use given object from options (or current_record as default)
         object = options.has_key?(:object) ? options.delete(:object) : current_record
 
-        # Cell alignment
-        align = options.delete(:align)
-        (th_options[:class] ||= '') << " #{align}" if align == :right
-        (td_options[:class] ||= '') << " #{align}" if align == :right
+        # :class given so add to TH and TD f.ex cell alignment :class=>'rgt'
+        if css_class = options.delete(:class)
+          (th_options[:class] ||= '') << " #{css_class}"
+          (td_options[:class] ||= '') << " #{css_class}"
+        end
 
         self.current_column_number += 1
 
@@ -77,37 +78,29 @@ module KingList
               # otherwise just plain text (no sorting link)
               title = title_text
             end
-            #mark the first and last columns with css classes
+            # mark the first and last columns with css classes
             if self.current_column_number == 1
               (th_options[:class] ||= '') << ' first'
             elsif self.current_column_number == self.number_of_columns
-              (th_options[:class] ||= '') <<  ' last'
+              (th_options[:class] ||= '') << ' last'
             end
            @template.capture_haml do
             @template.haml_tag(:th, title.to_s, th_options)
-          end
-            
+          end            
 
           when :content
             # Use given value (or formatted value as default)
             value = options.delete(:value) || @template.formatted_value(object, field_name, value)
 
             # If link option is set, then link to this
-            #
-            # ===Example
-            #
+            # === Example            #
             # :link => true : uses current object show link
-            #
             # :link => nil or blank no linking
-            #
             if link = options.delete(:link)
-              #link to current_oject if true given
+              # link to current_oject if true given
               link = object if link == true
-              if (!value.blank?) && (!link.blank?) #link and linked text is present
-                value = @template.link_to(value, link)
-              else #leave col text empty
-                value = ''
-              end
+              # link and linked text is present else leave col text empty
+              value = (!value.blank? && !link.blank?) ? @template.link_to(value, link) : ''
             end
 
             # If row_link option is set, then link to the current object
@@ -122,7 +115,6 @@ module KingList
           @template.capture_haml do
             @template.haml_tag(:td, value.to_s, td_options)
           end
-#          @template.haml_concat
         end # case mode
       end
 

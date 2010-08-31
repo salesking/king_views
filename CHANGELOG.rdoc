@@ -1,0 +1,8 @@
+= King Views Changelog
+
+2010.08.31
+
+* dropped support for KingList table cell alignment option, so instead of t.column :name, align=>:right go for :class=>:right and 'right' will be set as class on both th and td
+* more KingList documentation
+
+.. older read git commit messages
