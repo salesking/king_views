@@ -5,18 +5,19 @@
 
 Gem::Specification.new do |s|
   s.name = %q{king_views}
-  s.version = "1.0.4"
+  s.version = "1.0.5"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Georg Leciejewski"]
-  s.date = %q{2010-08-16}
+  s.date = %q{2010-08-31}
   s.description = %q{Clean up your Forms using king_form for dl or labeled forms. Use king_list for an easy markup of tables in your lists and dl-enabled listings in your detail views. }
   s.email = %q{gl@salesking.eu}
   s.extra_rdoc_files = [
     "README.rdoc"
   ]
   s.files = [
-    "MIT-LICENSE",
+    "CHANGELOG.rdoc",
+     "MIT-LICENSE",
      "README.rdoc",
      "Rakefile",
      "VERSION",
