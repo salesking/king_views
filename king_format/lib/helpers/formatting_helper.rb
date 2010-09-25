@@ -45,10 +45,8 @@ module KingFormat
       elsif (object.class.is_percent_field?(fld) rescue nil)
         (val && !val.blank?) ? number_to_percentage_auto_precision(val) : ''
       elsif (object.class.is_money_field?(fld) rescue nil) || opts[:currency]
-        # field is defined as money field OR currency options are passed in
-        # get currency from opts or company or fallback into i18n
-        settings = opts[:currency] || default_currency_format
-        number_to_currency(val, settings.merge({:locale => I18n.locale}))
+        # field is defined as money field OR currency options are passed in        
+        strfmoney(val, opts[:currency])
       elsif ( val.is_a?(Date) || (object.class.is_date_field?(fld) rescue nil) || opts[:date] )
         # field is defined as date field OR date options are passed in
         return val if val.blank? # blank value can occur when a is_date_field is empty
@@ -67,6 +65,13 @@ module KingFormat
         end
       end
     end #strfval
+
+    # Formats the given value using rails number_to_currency. Get currency
+    # from options hash or @default_currency_format or i18n as fallback
+    def strfmoney(val, opts={})
+      settings = opts || default_currency_format
+      number_to_currency(val, settings.merge({:locale => I18n.locale}))
+    end
 
     # Deprecated, to be dropped
     def formatted_value(object, fld, val=nil, opts={})
@@ -94,13 +99,13 @@ module KingFormat
     # places than the given prescision those are used.
     #
     # === Examples
-    #   money_auto_precision(1.2340, 2)
+    #   auto_precision(1.2340, 2)
     #   => "1.234"
     #   
-    #   money_auto_precision(1.234500)
+    #   auto_precision(1.234500)
     #   => "1.2345"
     #   
-    #   money_auto_precision(1.2345, 5)
+    #   auto_precision(1.2345, 5)
     #   => "1.23450"
     #
     # ====Parameter
@@ -108,8 +113,8 @@ module KingFormat
     # precs<Integer>:: The precision to which to round the number
     # ==== Return
     # nil if number is nil
-    # <String> with formatted number
-    def money_auto_precision(number, precs)
+    # <Float> with formatted number
+    def auto_precision(number, precs=2)
       return unless number
       decimals = number.to_s[/\.(.*)\z/, 1] #15.487 => 487
       precision = (decimals && decimals.length > precs) ? decimals.length : precs
