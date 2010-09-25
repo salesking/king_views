@@ -1,20 +1,37 @@
 = KingFormat
+
+Define fields being of type date, currency or percent.  When the fields are shown
+within KingList/KingForm views, their format is detected and the output is
+automatically formatted. Default formats of date and currency fields can be set
+and both also take te current I18n.locale into account.
+
 KingFormat consists of two different formatting helper regions:
 
 == Model
-Define fields being of type date, money or percent.  When the fields are shown in the
-views, their format is detected and the output is looking nice.
+
+This is where you define the type of fields/attributes. Of course the model
+should somehow respond to those method names.
+
+  class Document
+    has_money_fields :gross_total, :net_total
+    has_date_fields :created_at, :date
+    has_percent_fields :discount
+    ...
+  end
 
 == View & Helper
-Output any model value through the function formatted_value() to ensure a consistent output.
 
-There are select values for money-symbols and date formatting.
+Output any model value through the function strfval() to ensure a consistent output.
+Further on you find select values for money-symbols and date formatting.
+
+A simple HAML example, without hussles:
+
+  - dl_for(current_object) do |f|
+    = f.show :net_total
+    = f.show :gross_total
+    = f.show :date
+    = f.show :discount
+    = f.show :net_total, :value=>strfval(current_object, :net_total)
 
 
-== Example
-In a Model
-  has_money_fields :amount
-  has_date_fields :subscription_start
-  has_percent_fields :tax
-
-Copyright (c) 2009 Georg Leciejewski, released under the MIT license
+Copyright (c) 2009-2010 Georg Leciejewski, released under the MIT license

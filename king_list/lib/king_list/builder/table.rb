@@ -90,7 +90,7 @@ module KingList
 
           when :content
             # Use given value (or formatted value as default)
-            value = options.delete(:value) || @template.formatted_value(object, field_name, value)
+            value = options.delete(:value) || @template.strfval(object, field_name, value)
 
             # If link option is set, then link to this
             # === Example            #

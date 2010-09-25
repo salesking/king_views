@@ -49,7 +49,7 @@ module KingList
         caption = options.delete(:caption) || object.class.human_attribute_name(field_name.to_s)
 
         # Use given value or take formatted value as default
-        value = options.delete(:value) || @template.formatted_value(object, field_name)  || '&nbsp;'
+        value = options.delete(:value) || @template.strfval(object, field_name)  || '&nbsp;'
 
         # if link option is set, then link to this object
         if link = options.delete(:link)

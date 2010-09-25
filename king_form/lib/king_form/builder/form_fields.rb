@@ -8,7 +8,7 @@ module KingForm
       # Generate input tag with title for text editing
       # ==== Example
       # 1) text :name
-      # 2) text :name, :title => 'Your Name:', :value => @the_name, :size=>30, .maxlength=>35
+      # 2) text :name, :title => 'Your Name:', :value => @the_name, :size=>30, :maxlength=>35
       #
       # ==== Parameter
       # fieldname<Symbol, String>:: The field name of the current object
@@ -268,7 +268,7 @@ module KingForm
         end
 
         title = options.delete(:title) || build_title(fieldname)
-        value = options.delete(:value) || @template.formatted_value(current_object, fieldname)
+        value = options.delete(:value) || @template.strfval(current_object, fieldname)
 
         if info_text = options.delete(:info) #add info tag if info test given
           value << info_tag(info_text)

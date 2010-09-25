@@ -1,3 +1,4 @@
+require 'active_support/deprecation'
 # KingFormat
 $LOAD_PATH << File.expand_path(File.dirname(__FILE__))
 
