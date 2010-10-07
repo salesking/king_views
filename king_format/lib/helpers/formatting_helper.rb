@@ -3,7 +3,10 @@ module KingFormat
   module FormattingHelper
 
     include ActionView::Helpers::NumberHelper
+
     # Get a nice formatted string for an object attribute value.
+    #
+    # ====
     #
     # ==== Parameters
     # object<Object>:: The object on which the given fld name will be called
@@ -15,20 +18,33 @@ module KingFormat
     # opts<Hash{Symbol=>String}>:: Options
     #  
     # ==== Options opts
-    #  currency<Hash{Symbol=>String}>:: Currency settings to format string as a money like found in rails I18n.
-    #  or see rails number_helper.
-    #  When set, object AND fld must be set and the field must be in money_fields (via: has_money_fields)
-    #  Alternatively you can call the method with currency options set which will also lead to money rendering
-    #  format -> defaults to :html returned html string has escaped html entities
+    #  :currency<Hash{Symbol=>String}>:: Currency settings to format string as
+    #  money like found in rails I18n(see rails number_helper)
+    #  Leads to money rendering when set.
+    #  :format<Symbol>:: when set to :html returns string with escaped html entities
     #
     # ==== AutoDetect Types
     # A value is formatted according to its type which we try to detect.
     #   <Symbol>:: assume a value from acts_as_enum
     #   <DateTime|Time|Date>::I18n.localize -> l(value)
-    #   <TrueClass|FalseClass>:: translate to yes / no
-    #   <MoneyField String>:: coming from a has_percent_fields, formats the number with number_to_percentage_auto_precision
-    #   <PercentField String>:: comming from has_money_fields I18n formats as money string
-    #
+    #   Used if value is a Date class, field is declared in has_date_fields, or
+    #   opts[:date] is set
+    #   <TrueClass|FalseClass>:: translates to yes/no in sk namespace t(:'sk.yes')
+    #   <PercentField|String>:: coming from a has_percent_fields, formats the
+    #   number with number_to_percentage_auto_precision
+    #   <MoneyField|String>:: Used if opts[:currency] is set OR field is defined
+    #   via has_money_fields.
+    #   Formats the value as money string using different formatting fallbacks:
+    #   1. options passed in via :currency=>{..}
+    #   2. if object and val are present AND the object has a method called:
+    #   "fieldname"_format_opts => price_format_opts
+    #   It's return value(Hash{Rails currency format opts} is used.
+    #   This should be used if you have a default format for all money vals, but
+    #   one differs eg. in precision
+    #   3. @default_currency_format
+    #   4. I18n actually resided in rails
+    # Whatever you use be aware to always pass all formatting options since rails
+    # merges unavailable keys with i18n defaults
     def strfval (object, fld, val=nil, opts={})
       # If no value given, call fld on object to get the current value
       #return the content(a pointer) or an empty string OR  nil of field is not available
@@ -45,10 +61,13 @@ module KingFormat
       elsif (object.class.is_percent_field?(fld) rescue nil)
         (val && !val.blank?) ? number_to_percentage_auto_precision(val) : ''
       elsif (object.class.is_money_field?(fld) rescue nil) || opts[:currency]
-        # field is defined as money field OR currency options are passed in        
-        strfmoney(val, opts[:currency])
+      # field is defined as money field OR currency options are passed in
+        method_name = "#{fld}_format_opts".to_sym
+        # check if the object has a custom money format method => price_total_format_opts
+        fopts = object.send(method_name) if object && object.respond_to?(method_name)
+        strfmoney(val, fopts || opts[:currency])
       elsif ( val.is_a?(Date) || (object.class.is_date_field?(fld) rescue nil) || opts[:date] )
-        # field is defined as date field OR date options are passed in
+      # field is defined as date field OR date options are passed in
         return val if val.blank? # blank value can occur when a is_date_field is empty
         # get date from opts or default or fallback into i18n
         format = opts[:date] || default_date_format
@@ -66,8 +85,11 @@ module KingFormat
       end
     end #strfval
 
-    # Formats the given value using rails number_to_currency. Get currency
+    # Formats the given value using rails number_to_currency. Get's currency
     # from options hash or @default_currency_format or i18n as fallback
+    # === Params
+    # val<Number>:: the number to format
+    # opts<Hash{Symbol=>String}>:: Rails compatible currency formatting options
     def strfmoney(val, opts={})
       settings = opts || default_currency_format
       number_to_currency(val, settings.merge({:locale => I18n.locale}))
@@ -81,6 +103,7 @@ module KingFormat
 
     # Returns the default date formatting.
     # The returned string is passed to strftime(format)
+    # Override this function somehere in you controllers or set the instance var
     # === Returns
     # <String>:: strftime compatible string
     def default_date_format
@@ -88,7 +111,8 @@ module KingFormat
     end
    
     # Returns the default currency formatting
-    # The returned hash is used in rails number_to_currency helper
+    # The returned hash is used in rails number_to_currency helper.
+    # Override this function somehere in you controllers or set the instance var
     # === Returns
     # <Hash>:: number_to_currency compatible options hash
     def default_currency_format

@@ -34,7 +34,7 @@ module KingFormat
       # ==== Parameter
       # fieldname<String>:: The fieldname to check. Is casted into a symbol.
       def is_money_field?(fieldname)
-        self.class.money_fields.include?(fieldname.to_sym)
+        self.class.is_money_field?(fieldname)
       end
     end
     

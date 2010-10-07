@@ -270,7 +270,7 @@ module KingForm
         title = options.delete(:title) || build_title(fieldname)
         value = options.delete(:value) || @template.strfval(current_object, fieldname)
 
-        if info_text = options.delete(:info) #add info tag if info test given
+        if info_text = options.delete(:info) #add info tag if info given
           value << info_tag(info_text)
         end
         #keep existing class and add class right to wrapping element if its a money field
