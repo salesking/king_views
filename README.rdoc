@@ -1,14 +1,11 @@
 = KingViews
 
-This is the new offical home of KingViews(forked from schorsch)
-
 KingViews where extracted from SalesKing(https://www.SalesKing.eu) and consist 
-of three different view helpers, KingForm( dl || labeled forms, enhanced inputs ),
+of three different view helpers, KingForm( dl or labeled forms, enhanced inputs ),
 KingList( dl, tables ) and KingFormat( date, money, percent )
 
-This stuff is not optimized(yet) to run seamlessly within any rails project.
-Fixes for rails 2.3.5 and of course 3.0 are needed. Some refacturing and of
-course testing(still stuck in SalesKing) should be done, leaving space for forks.
+This stuff is not tested with rails 3.0 and testing is still stuck in SalesKing
+.. leaving space for forks.
 
 == Install
 
@@ -89,4 +86,4 @@ Also see README http://github.com/salesking/king_views/tree/master/king_format/
     # see above for usage in views
 
 == License
-Copyright (c) 2009 Georg Leciejewski, released under the MIT-LICENSE
+Copyright (c) 2009,2010 Georg Leciejewski, released under the MIT-LICENSE
