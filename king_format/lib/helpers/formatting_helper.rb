@@ -45,7 +45,7 @@ module KingFormat
     #   4. I18n actually resided in rails
     # Whatever you use be aware to always pass all formatting options since rails
     # merges unavailable keys with i18n defaults
-    def strfval (object, fld, val=nil, opts={})
+    def strfval( object, fld, val=nil, opts={} )
       # If no value given, call fld on object to get the current value
       #return the content(a pointer) or an empty string OR  nil of field is not available
       val ||= object.respond_to?(fld) ? ( object.send(fld) || '') : nil
@@ -54,7 +54,7 @@ module KingFormat
         nil
       elsif val.is_a?(Symbol) # enum value from acts_as_enum
         translated_enum_value(object, fld, val)
-      elsif val.is_a?(DateTime) || val.is_a?(Time)  #|| val.is_a?(Date)
+      elsif val.is_a?(DateTime) || val.is_a?(Time)
         I18n.localize(val)
       elsif val.is_a?(TrueClass) || val.is_a?(FalseClass)
         val ? t(:'sk.yes') : t(:'sk.no')
@@ -62,13 +62,13 @@ module KingFormat
         (val && !val.blank?) ? number_to_percentage_auto_precision(val) : ''
       elsif (object.class.is_money_field?(fld) rescue nil) || opts[:currency]
       # field is defined as money field OR currency options are passed in
-        method_name = "#{fld}_format_opts".to_sym
+        format_method = "#{fld}_format_opts".to_sym
         # check if the object has a custom money format method => price_total_format_opts
-        fopts = object.send(method_name) if object && object.respond_to?(method_name)
-        strfmoney(val, fopts || opts[:currency])
+        fopts = object && object.respond_to?(format_method) ? object.send(format_method) : opts[:currency]
+        strfmoney(val, fopts)
       elsif ( val.is_a?(Date) || (object.class.is_date_field?(fld) rescue nil) || opts[:date] )
       # field is defined as date field OR date options are passed in
-        return val if val.blank? # blank value can occur when a is_date_field is empty
+        return val if val.blank? # blank value can occur when a is_date_field is empty       
         # get date from opts or default or fallback into i18n
         format = opts[:date] || default_date_format
         format.blank? ? ::I18n.localize(val) : val.strftime(format)
@@ -89,9 +89,10 @@ module KingFormat
     # from options hash or @default_currency_format or i18n as fallback
     # === Params
     # val<Number>:: the number to format
-    # opts<Hash{Symbol=>String}>:: Rails compatible currency formatting options
-    def strfmoney(val, opts={})
-      settings = opts || default_currency_format
+    # opts<Hash{Symbol=>String}>:: Rails compatible currency formatting options,
+    # when nil searches default format, last exit is rails i18n
+    def strfmoney(val, opts=nil)
+      settings = opts || default_currency_format || {}
       number_to_currency(val, settings.merge({:locale => I18n.locale}))
     end
 
@@ -100,23 +101,60 @@ module KingFormat
       ::ActiveSupport::Deprecation.warn('"formatted_value" has been deprecated, use the "strfval" instead. Func will be removed within next releases', caller)
       strfval(object, fld, val, opts)
     end
+    # Formatting as Percentage, but use precision only if needed.
+    # Examples:
+    #   number_to_percentage_auto_precision(19)
+    #   => 19%
+    #   number_to_percentage_auto_precision(7.5)
+    #   => 7,5%
+    def number_to_percentage_auto_precision(number)
+      return nil unless number
+      # for now use seperator
+      pres = (number.to_i == number.to_f) ? 0 : 1
+      sep =  I18n.t(:'number.format.precision.separator')
+      number_to_percentage(number,{:precision => pres, :separator=>sep } )
+    end
 
-    # Returns the default date formatting.
+    # Translate the value of an enum field, as defined by act_as_enum
+    # Example:
+    #   client.sending_method = :fax
+    #   translated_enum_value(client, :sending_method)
+    #   => "activerecord.attributes.client.enum.sending_method.fax"
+    def translated_enum_value(object_or_class, fieldname, value = nil)
+      if object_or_class.is_a?(Class)
+        klass = object_or_class
+      else
+        klass = object_or_class.class
+        # If no value given, get the current value
+        value ||= object_or_class.send(fieldname)
+      end
+      # Don't translate blank value
+      return nil if value.blank?
+      #return the translation
+      klass.human_attribute_name("enum.#{fieldname.to_s}.#{value.to_s}")
+    end
+    
+    # Returns the default date formatting, as string '%d.%m.%Y'
     # The returned string is passed to strftime(format)
-    # Override this function somehere in you controllers or set the instance var
+    # Override this function or set the thread var somehere in your including
+    # class
+    # => scope when used in view is ActionView::Base
     # === Returns
     # <String>:: strftime compatible string
     def default_date_format
-      @default_date_format || {}
+      Thread.current[:default_date_format]
     end
    
-    # Returns the default currency formatting
+    # Returns the default currency formatting, in I18n style
     # The returned hash is used in rails number_to_currency helper.
-    # Override this function somehere in you controllers or set the instance var
+    # Override this function or set the thread var somehere in your including
+    # class
+    # => scope when used in view is ActionView::Base
+    #
     # === Returns
     # <Hash>:: number_to_currency compatible options hash
     def default_currency_format
-      @default_currency_format || {}
+      Thread.current[:default_currency_format]
     end
     
     # Formats a number to the visible decimal places. If there are more decimal 
@@ -146,6 +184,5 @@ module KingFormat
       "%01.#{precision}f" % rounded_number
     end
 
-  end # FormattingHelper
-  
+  end # FormattingHelper  
 end # KingFormat

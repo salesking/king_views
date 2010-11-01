@@ -83,22 +83,22 @@ module KingList
     # Header linking for all, default
     #   - table_for(@users) do |t, user|
     #     - t.column :name  # with sorting
-    #     - t.column :email # with sorting
+    #     - t.column :email
     #
     # Header linking for all, but exclude individual columns from sorting:
     #  - table_for(@users)do |t, user|
     #    - t.column :name, :sorting => false  # without sorting
-    #    - t.column :last_name                # with sorting
+    #    - t.column :last_name
     #
     # NO header linking for all columns:
     #  - table_for(@users, :sorting => false) do |t, user|
-    #    - t.column :name  # without sorting
-    #    - t.column :email # without sorting
+    #    - t.column :name
+    #    - t.column :email
     #
     # No header linking for all, but allow sorting for individual columns:
     #  - table_for(@users, :sorting => false) do |t, user|
     #    - t.column :name, :sorting => true # with sorting
-    #    - t.column :last_name              # without sorting
+    #    - t.column :last_name
     #
     def table_for(collection, options={}, html_options={}, &block)
       return if collection.nil? || collection.empty?
