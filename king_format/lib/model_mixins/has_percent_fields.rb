@@ -26,7 +26,7 @@ module KingFormat
 
       # Check if a given field is declared as percent
       def is_percent_field?(fieldname)
-        self.percent_fields.include?(fieldname) if self.respond_to?(:percent_fields)
+        self.percent_fields.include?(fieldname.to_sym)
       end
     end
 
