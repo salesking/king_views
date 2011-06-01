@@ -1,5 +1,5 @@
 module KingList
-  # The List Helper aides in lists anddetail views by providing helpers for:
+  # The List Helper provides methods for lists and detail views:
   # tables, action icons, action buttons and action links, definition list helper
   module ListHelper
 
@@ -34,7 +34,7 @@ module KingList
       end
 
       haml_tag :dl, options do
-        yield KingList::Builder::Show.new(object_name, object, @template)
+        yield KingList::Builder::Show.new(object_name, object, render_context)
       end
     end
 
@@ -60,16 +60,16 @@ module KingList
 
       caption ||= options.delete(:caption)
 
-      @template.haml_tag :fieldset, options do
-        @template.haml_tag :legend, caption unless caption.blank?
-        @template.haml_concat @template.capture_haml(&block)
+      render_context.haml_tag :fieldset, options do
+        render_context.haml_tag :legend, caption unless caption.blank?
+        render_context.haml_concat render_context.capture_haml(&block)
       end
     end
 
     # Create a div for form actions
     def actions(options = {}, &block)
-      @template.haml_tag :div, options.merge(:class => 'form_actions') do
-        @template.haml_concat @template.capture_haml(&block)
+      render_context.haml_tag :div, options.merge(:class => 'form_actions') do
+        render_context.haml_concat render_context.capture_haml(&block)
       end
     end
 
@@ -103,7 +103,7 @@ module KingList
     def table_for(collection, options={}, html_options={}, &block)
       return if collection.nil? || collection.empty?
 
-      builder = KingList::Builder::Table.new(@template, collection)
+      builder = KingList::Builder::Table.new(render_context, collection)
       # extract options
       builder.sorting = options.delete(:sorting) != false # default => true
 
@@ -132,7 +132,7 @@ module KingList
           collection.each do |c|
             tr_options = {}
             # zebra styling
-            tr_options[:class] = @template.cycle('odd','even')
+            tr_options[:class] = render_context.cycle('odd','even')
 
             haml_tag :tr, tr_options do
               builder.start_row(c)
@@ -252,7 +252,7 @@ module KingList
     #   </form>
     #
     def action_button(fieldname, options)
-      @template.capture_haml do
+      render_context.capture_haml do
         haml_tag :li, :class=>'form_btn' do
           haml_concat mini_action_form(fieldname, options)
         end
@@ -300,7 +300,7 @@ module KingList
       haml_tag :ol, options do
         collection.each_with_index do |c,i|
           li_options = {}
-          li_options[:class] = @template.cycle('odd','even')
+          li_options[:class] = render_context.cycle('odd','even')
           li_options[:value] = collection.length - i if descending
           haml_tag :li, li_options do
             yield(c)
@@ -314,7 +314,7 @@ module KingList
     # Internal method used by action_text, action_button and action_icon
     # Directly returns a haml string into the template
     def action(kind, name_or_title, link_options, li_options={}, html_options={})
-      @template.capture_haml do
+      render_context.capture_haml do
         haml_tag :li, li_options do
           case kind
             when :icon   then haml_concat link_to('', link_options, html_options)
@@ -323,6 +323,11 @@ module KingList
           end
         end
       end
+    end
+
+    def render_context
+      @template || view_context
+      # if rails < 2 ..
     end
 
   end #ListHelper
