@@ -1,3 +1,4 @@
+# encoding: utf-8
 module KingForm
   module Builder
     # Create forms with a fieldset->div->label->input structure

@@ -1,3 +1,4 @@
+# encoding: utf-8
 module KingForm
   module Builder
     module FormFields

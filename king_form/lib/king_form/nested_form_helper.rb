@@ -43,7 +43,7 @@ module KingForm
                                #The current objects classname is always present in partial so:
                                #when Object is LineItem locals has :line_item => object
                                :locals => {name.to_sym => f.object, :f => f}.merge( opts[:locals] || {} )
-                              }.merge( opts[:render] || {} ) )
+                              }.merge( opts[:render] || {} ) )      
           end
         end
         output.join

@@ -3,7 +3,7 @@
 Define fields being of type date, currency or percent.  When the fields are shown
 within KingList/KingForm views, their format is detected and the output is
 automatically formatted. Default formats of date and currency fields can be set
-and both also take te current I18n.locale into account.
+or they take the current I18n.locale into account.
 
 KingFormat consists of two different formatting helper regions:
 

@@ -43,8 +43,8 @@ module KingFormat
     #   one differs eg. in precision
     #   3. @default_currency_format
     #   4. I18n actually resided in rails
-    # Whatever you use be aware to always pass all formatting options since rails
-    # merges unavailable keys with i18n defaults
+    #   Whatever you use be aware to always pass all formatting options since rails
+    #   merges unavailable keys with i18n defaults
     def strfval( object, fld, val=nil, opts={} )
       # If no value given, call fld on object to get the current value
       #return the content(a pointer) or an empty string OR  nil of field is not available
@@ -61,14 +61,12 @@ module KingFormat
       elsif (object.class.is_percent_field?(fld) rescue nil)
         (val && !val.blank?) ? number_to_percentage_auto_precision(val) : ''
       elsif (object.class.is_money_field?(fld) rescue nil) || opts[:currency]
-      # field is defined as money field OR currency options are passed in
         format_method = "#{fld}_format_opts".to_sym
         # check if the object has a custom money format method => price_total_format_opts
         fopts = object && object.respond_to?(format_method) ? object.send(format_method) : opts[:currency]
         strfmoney(val, fopts)
       elsif ( val.is_a?(Date) || (object.class.is_date_field?(fld) rescue nil) || opts[:date] )
-      # field is defined as date field OR date options are passed in
-        return val if val.blank? # blank value can occur when a is_date_field is empty       
+        return val if val.blank? # blank value can occur when a is_date_field is empty
         # get date from opts or default or fallback into i18n
         format = opts[:date] || default_date_format
         format.blank? ? ::I18n.localize(val) : val.strftime(format)
@@ -109,9 +107,9 @@ module KingFormat
     #   => 7,5%
     def number_to_percentage_auto_precision(number)
       return nil unless number
-      # for now use seperator
+      # for now use separator
       pres = (number.to_i == number.to_f) ? 0 : 1
-      sep =  I18n.t(:'number.format.precision.separator')
+      sep =  I18n.t(:'number.format.separator')
       number_to_percentage(number,{:precision => pres, :separator=>sep } )
     end
 

@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 module KingFormat
   # a little rewrite of the rails internal number helper with better:
   # - rounding
