@@ -86,7 +86,7 @@ module KingList
             end
            @template.capture_haml do
             @template.haml_tag(:th, title.to_s, th_options)
-          end            
+          end
 
           when :content
             # Use given value (or formatted value as default)
@@ -145,7 +145,10 @@ module KingList
               @template.haml_concat I18n.t(:'link.actions')
             end
           when :content
-            @template.haml_tag :td, :class => 'actions' do
+            td_options = options[:td_options] || {}
+            td_options[:class] = td_options[:class].to_a || []
+            td_options[:class] << 'actions'
+            @template.haml_tag :td, td_options do
               @template.haml_tag :ul, :class => 'actions' do
                 @template.haml_concat @template.capture_haml(&block)
               end
