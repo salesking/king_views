@@ -84,9 +84,9 @@ module KingList
             elsif self.current_column_number == self.number_of_columns
               (th_options[:class] ||= '') << ' last'
             end
-           @template.capture_haml do
-            @template.haml_tag(:th, title.to_s, th_options)
-          end
+            @template.capture_haml do
+              @template.haml_tag(:th, title.to_s, th_options)
+            end
 
           when :content
             # Use given value (or formatted value as default)
@@ -112,9 +112,9 @@ module KingList
               # and an onclick-event can be installed (TODO)
               td_options.merge!(:class => 'row_link')
             end
-          @template.capture_haml do
-            @template.haml_tag(:td, value.to_s, td_options)
-          end
+            @template.capture_haml do
+              @template.haml_tag(:td, value.to_s, td_options)
+            end
         end # case mode
       end
 
@@ -146,7 +146,7 @@ module KingList
             end
           when :content
             td_options = options[:td_options] || {}
-            td_options[:class] = td_options[:class].to_a || []
+            td_options[:class] = [td_options[:class]].flatten || []
             td_options[:class] << 'actions'
             @template.haml_tag :td, td_options do
               @template.haml_tag :ul, :class => 'actions' do
