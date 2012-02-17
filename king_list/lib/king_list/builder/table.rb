@@ -147,7 +147,10 @@ module KingList
               @template.haml_concat I18n.t(:'link.actions')
             end
           when :content
-            @template.haml_tag :td, :class => 'actions' do
+            td_options = options[:td_options] || {}
+            td_options[:class] = td_options[:class].to_a || []
+            td_options[:class] << 'actions'
+            @template.haml_tag :td, td_options do
               @template.haml_tag :ul, :class => 'actions' do
                 @template.haml_concat @template.capture_haml(&block)
               end
