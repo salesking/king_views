@@ -107,7 +107,7 @@ module KingList
       # extract options
       builder.sorting = options.delete(:sorting) != false # default => true
 
-      #@elapsed = Benchmark.realtime do
+      @elapsed = Benchmark.realtime do
 
       # First step: Yield the block just for counting the columns
       builder.mode = :counter
@@ -144,8 +144,8 @@ module KingList
         end
 
       end
-      #end # benchmarking
-      #puts "Took #{@elapsed} seconds"
+      end # benchmarking
+      puts "Took #{@elapsed} seconds"
     end
 
     # Show a list of options as ul / li list.
@@ -330,8 +330,8 @@ module KingList
     end
 
     def render_context
+      # rails 2 || rails 3.2
       @template || self
-      # if rails < 2 .. || rails 3
     end
 
   end #ListHelper

@@ -113,7 +113,7 @@ module KingList
               td_options.merge!(:class => 'row_link')
             end
             @template.capture_haml do
-              "<td #{td_options.collect{|k,v| "#{k}='#{v}'" }.join(' ') } >#{value.to_s}</td>"
+              return "<td #{td_options.collect{|k,v| "#{k}='#{v}'" }.join(' ') } >#{value.to_s}</td>"
             end
         end # case mode
       end
