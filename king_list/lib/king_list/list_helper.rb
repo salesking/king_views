@@ -102,10 +102,12 @@ module KingList
     #
     def table_for(collection, options={}, html_options={}, &block)
       return if collection.nil? || collection.empty?
-
+      table_str = ''
       builder = KingList::Builder::Table.new(render_context, collection)
       # extract options
       builder.sorting = options.delete(:sorting) != false # default => true
+
+      #@elapsed = Benchmark.realtime do
 
       # First step: Yield the block just for counting the columns
       builder.mode = :counter
@@ -142,6 +144,8 @@ module KingList
         end
 
       end
+      #end # benchmarking
+      #puts "Took #{@elapsed} seconds"
     end
 
     # Show a list of options as ul / li list.
@@ -326,8 +330,8 @@ module KingList
     end
 
     def render_context
-      @template || view_context
-      # if rails < 2 ..
+      @template || self
+      # if rails < 2 .. || rails 3
     end
 
   end #ListHelper

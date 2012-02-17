@@ -84,9 +84,9 @@ module KingList
             elsif self.current_column_number == self.number_of_columns
               (th_options[:class] ||= '') << ' last'
             end
-           @template.capture_haml do
-            @template.haml_tag(:th, title.to_s, th_options)
-          end            
+            @template.capture_haml do
+              @template.haml_tag(:th, title.to_s, th_options)
+            end
 
           when :content
             # Use given value (or formatted value as default)
@@ -112,11 +112,13 @@ module KingList
               # and an onclick-event can be installed (TODO)
               td_options.merge!(:class => 'row_link')
             end
-          @template.capture_haml do
-            @template.haml_tag(:td, value.to_s, td_options)
-          end
+            @template.capture_haml do
+              "<td #{td_options.collect{|k,v| "#{k}='#{v}'" }.join(' ') } >#{value.to_s}</td>"
+            end
         end # case mode
       end
+
+
 
       #build a table column which holds action links (edit/del/show/..) for each record
       #is used for table listings ex. on index pages

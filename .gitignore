@@ -19,3 +19,8 @@ nbproject/*
 rdoc
 pkg
 /.idea/
+Gemfile.lock
+tmp/
+log/
+vendor/
+test.sqlite3
