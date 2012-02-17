@@ -1,0 +1,4 @@
+- table_for(@posts) do |t, post|
+  = t.column :title
+  = t.column :created_at
+  = t.column :updated_at, :td_options => {:class=>'xy'}

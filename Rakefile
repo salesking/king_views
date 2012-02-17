@@ -3,6 +3,10 @@ require 'rake'
 require 'rdoc/task'
 require 'rspec/core/rake_task'
 
+RSpec::Core::RakeTask.new('spec')
+desc 'Default: run specs.'
+task :default => :spec
+
 begin
   require 'jeweler'
   Jeweler::Tasks.new do |gem|
