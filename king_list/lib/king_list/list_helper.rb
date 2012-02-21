@@ -238,7 +238,10 @@ module KingList
     #
     def action_button(fieldname, options)
       render_context.capture_haml do
-        haml_tag :li, :class=>'form_btn' do
+        li_options = options.delete(:li_options) || {}
+        li_options[:class] ||= []
+        li_options[:class] << " form_btn"
+        haml_tag :li, li_options do
           haml_concat mini_action_form(fieldname, options)
         end
       end
