@@ -30,7 +30,11 @@ module KingList
           object = args.first
         else
           object = record_or_name
-          object_name = ActionController::RecordIdentifier.singular_class_name(object)
+          object_name = if ActionController::RecordIdentifier.respond_to?(:singular_class_name)
+            ActionController::RecordIdentifier.singular_class_name(object) # rails 2
+           else #Rails 3
+              ActiveModel::Naming.singular(object)
+          end
       end
 
       haml_tag :dl, options do
