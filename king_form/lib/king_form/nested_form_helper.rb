@@ -2,15 +2,15 @@ module KingForm
   #  was attribute_fu with changes from: http://github.com/odadata/attribute_fu/commit/a0402d12f2d380d8decc82bdfbcc5d8a0a185524
   # Methods for building forms that contain fields for associated models.
   module NestedFormHelper
-    
+
     # Renders the form for nested objects defined via activerecord accepts_nested_attributes_for
     #
     # The associated argument can be either an object, or a collection of objects to be rendered.
     #
     # An options hash can be specified to override the default behaviors.
-    # 
+    #
     # Options are:
-    # * <tt>:new</tt>        - specify a certain number of new elements to be added to the form. Useful for displaying a 
+    # * <tt>:new</tt>        - specify a certain number of new elements to be added to the form. Useful for displaying a
     #                         few blank elements at the bottom.
     # * <tt>:name</tt>       - override the name of the association, both for the field names, and the name of the partial
     # * <tt>:partial</tt>    - specify the name of the partial in which the form is located.
@@ -21,8 +21,8 @@ module KingForm
     #                       eg. obj.addresses, render the firt address on top of form, render all the other addresses at the bottom
     #
     def render_nested_form(associated, opts = {})
-      associated = associated.is_a?(Array) ? associated : [associated] # preserve association proxy if this is one      
-      opts.symbolize_keys!
+      associated = associated.is_a?(Array) ? associated : [associated] # preserve association proxy if this is one
+      opts = opts.to_hash.symbolize_keys
       (opts[:new] - associated.select(&:new_record?).length).times { associated.build } if opts[:new]
 
       unless associated.empty?
@@ -43,13 +43,13 @@ module KingForm
                                #The current objects classname is always present in partial so:
                                #when Object is LineItem locals has :line_item => object
                                :locals => {name.to_sym => f.object, :f => f}.merge( opts[:locals] || {} )
-                              }.merge( opts[:render] || {} ) )      
+                              }.merge( opts[:render] || {} ) )
           end
         end
         output.join
       end
     end
-    
+
     private
       def association_name(class_name)
         @object.respond_to?("#{class_name}_attributes=") ? class_name : class_name.pluralize

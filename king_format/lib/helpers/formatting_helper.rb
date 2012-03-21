@@ -16,7 +16,7 @@ module KingFormat
     # When set this will be used instead of asking the object for its value.
     # See types for more
     # opts<Hash{Symbol=>String}>:: Options
-    #  
+    #
     # ==== Options opts
     #  :currency<Hash{Symbol=>String}>:: Currency settings to format string as
     #  money like found in rails I18n(see rails number_helper)
@@ -91,7 +91,7 @@ module KingFormat
     # when nil searches default format, last exit is rails i18n
     def strfmoney(val, opts=nil)
       settings = opts || default_currency_format || {}
-      number_to_currency(val, settings.merge({:locale => I18n.locale}))
+      number_to_currency(val, settings.merge({:locale => I18n.locale}).to_hash)
     end
 
     # Deprecated, to be dropped
@@ -131,7 +131,7 @@ module KingFormat
       #return the translation
       klass.human_attribute_name("enum.#{fieldname.to_s}.#{value.to_s}")
     end
-    
+
     # Returns the default date formatting, as string '%d.%m.%Y'
     # The returned string is passed to strftime(format)
     # Override this function or set the thread var somehere in your including
@@ -142,7 +142,7 @@ module KingFormat
     def default_date_format
       Thread.current[:default_date_format]
     end
-   
+
     # Returns the default currency formatting, in I18n style
     # The returned hash is used in rails number_to_currency helper.
     # Override this function or set the thread var somehere in your including
@@ -154,17 +154,17 @@ module KingFormat
     def default_currency_format
       Thread.current[:default_currency_format]
     end
-    
-    # Formats a number to the visible decimal places. If there are more decimal 
+
+    # Formats a number to the visible decimal places. If there are more decimal
     # places than the given prescision those are used.
     #
     # === Examples
     #   auto_precision(1.2340, 2)
     #   => "1.234"
-    #   
+    #
     #   auto_precision(1.234500)
     #   => "1.2345"
-    #   
+    #
     #   auto_precision(1.2345, 5)
     #   => "1.23450"
     #
@@ -182,5 +182,5 @@ module KingFormat
       "%01.#{precision}f" % rounded_number
     end
 
-  end # FormattingHelper  
+  end # FormattingHelper
 end # KingFormat
