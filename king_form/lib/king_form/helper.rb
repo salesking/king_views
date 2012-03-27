@@ -68,8 +68,15 @@ module KingForm
     #
     def labeled_form_for(record_or_name_or_array, *args, &proc)
       options = args.last.is_a?(Hash) ? args.pop : {}
-      options[:builder] =  KingForm::Builder::Labeled
-      form_for(record_or_name_or_array, *(args << options), &proc)
+      options[:builder] = KingForm::Builder::Labeled
+
+      case record_or_name_or_array
+      when String, Symbol
+        options[:as] = record_or_name_or_array
+        form_for(args.shift, *(args << options), &proc)
+      else
+        form_for(record_or_name_or_array, *(args << options), &proc)
+      end
     end
 
     def labeled_fields_for(record_or_name_or_array, *args, &block)
