@@ -85,22 +85,22 @@ module KingList
     # === Usage example:
     #
     # Header linking for all, default
-    #   - table_for(@users) do |t, user|
+    #   = table_for(@users) do |t, user|
     #     = t.column :name  # with sorting
     #     = t.column :email
     #
     # Header linking for all, but exclude individual columns from sorting:
-    #  - table_for(@users)do |t, user|
+    #  = table_for(@users)do |t, user|
     #    = t.column :name, :sorting => false  # without sorting
     #    = t.column :last_name
     #
     # NO header linking for all columns:
-    #  - table_for(@users, :sorting => false) do |t, user|
+    #  = table_for(@users, :sorting => false) do |t, user|
     #    = t.column :name
     #    = t.column :email
     #
     # No header linking for all, but allow sorting for individual columns:
-    #  - table_for(@users, :sorting => false) do |t, user|
+    #  = table_for(@users, :sorting => false) do |t, user|
     #    = t.column :name, :sorting => true # with sorting
     #    = t.column :last_name
     #
@@ -109,21 +109,23 @@ module KingList
       builder = KingList::Builder::Table.new(render_context, collection)
       # extract options
       builder.sorting = options.delete(:sorting) != false # default => true
-      concat("<table #{ to_attr(html_options) }><thead><tr>")
-      # Build header row
-      builder.mode = :header
-      builder.current_record = collection.first
-      yield(builder, builder.current_record)
-      concat("</tr></thead><tbody>")
-      builder.mode = :content
-      # Build content row for each collection item
-      collection.each do |c|
-        builder.current_record = c
-        concat("<tr>")
+      capture do
+        concat("<table #{ to_attr(html_options) }><thead><tr>".html_safe)
+        # Build header row
+        builder.mode = :header
+        builder.current_record = collection.first
         yield(builder, builder.current_record)
-        concat("</tr>")
+        concat("</tr></thead><tbody>".html_safe)
+        builder.mode = :content
+        # Build content row for each collection item
+        collection.each do |c|
+          builder.current_record = c
+          concat("<tr>".html_safe)
+          yield(builder, builder.current_record)
+          concat("</tr>".html_safe)
+        end
+        concat( "</tbody></table>".html_safe)
       end
-      concat( "</tbody></table>")
     end
 
     # TODO same in table class
@@ -275,7 +277,7 @@ module KingList
             request_token_tag +
             hidden_tag +
             "<button type='submit' name='submit' title='#{options[:title]}' class='#{options[:class]}'><span>#{options[:title]}</span></button>" +
-         "</div></form>"
+         "</div></form>".html_safe
     end
 
     # Renders a <ol> for a given collection and yields the block for every item
@@ -316,7 +318,7 @@ module KingList
             link_to(name_or_title, link_options, html_options)
           when :button
             button_to(name_or_title, link_options)
-        end } </li>}
+        end } </li>}.html_safe
       end
     end
 

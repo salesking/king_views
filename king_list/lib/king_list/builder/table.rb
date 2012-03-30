@@ -65,7 +65,7 @@ module KingList
               # otherwise just plain text (no sorting link)
               title = title_text
             end
-            "<th #{ to_attr(th_options) }>#{title.to_s}</th>" #.html_safe
+            "<th #{ to_attr(th_options) }>#{title.to_s}</th>".html_safe
 
           when :content
             # Use given value (or formatted value as default)
@@ -80,7 +80,7 @@ module KingList
               # link and linked text is present else leave col text empty
               value = (!value.blank? && !link.blank?) ? @template.link_to(value, link) : ''
             end
-            "<td #{ to_attr(td_options) }>#{value.to_s}</td>"
+            "<td #{ to_attr(td_options) }>#{value.to_s}</td>".html_safe
         end # case mode
       end
 
@@ -94,15 +94,14 @@ module KingList
       def action_column(options={}, &block)
         case mode
           when :header
-            @template.concat("<th>#{I18n.t(:'link.actions')}</th>")
+            @template.concat("<th>#{I18n.t(:'link.actions')}</th>".html_safe)
           when :content
             td_options = options[:td_options] || {}
             td_options[:class] = [td_options[:class]].flatten || []
             td_options[:class] << 'actions'
-            @template.concat("<td #{ to_attr(td_options) }><ul class='actions'>")
+            @template.concat("<td #{ to_attr(td_options) }><ul class='actions'>".html_safe)
             @template.concat( @template.capture_haml(&block) )
-            #@template.haml_concat @template.capture_haml(&block) #yield
-            @template.concat("</ul></td>")
+            @template.concat("</ul></td>".html_safe)
         end
       end
 
