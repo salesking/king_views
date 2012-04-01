@@ -46,7 +46,7 @@ module KingForm
                               }.merge( opts[:render] || {} ) )
           end
         end
-        output.join
+        output.join.html_safe
       end
     end
 

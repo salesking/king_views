@@ -64,8 +64,8 @@ module KingList
         value = '&nbsp;' if value.blank?
 
         @template.capture_haml do
-          @template.haml_tag :dt, caption, dt_options || options
-          @template.haml_tag :dd, value, dd_options || options
+          @template.haml_tag :dt, caption.html_safe, dt_options || options
+          @template.haml_tag :dd, value.html_safe, dd_options || options
         end
       end
 

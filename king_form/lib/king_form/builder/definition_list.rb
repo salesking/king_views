@@ -66,7 +66,7 @@ module KingForm
       #
       # ==== Parameter
       # fieldname_or_title<Symbol, String>:: The fieldname to be used as the title in dt
-      # tags<String>:: a bunch of html/haml tags 
+      # tags<String>:: a bunch of html/haml tags
       # options<Hash{Symbol=>String}>: Hash with following keys
       # ==== Options:
       #     :dt => options hash for dt
@@ -100,7 +100,11 @@ module KingForm
         @bundle_counter = 0
         tags = @template.capture(&block)
         @config[:bundle] = false
-        @template.concat( @config[:table] ? tag_wrapper(title, tags) : tag_wrapper(title, tags, :dt => options, :dd => { :class => "elements_#{@bundle_counter}" }) )
+        if @config[:table]
+          tag_wrapper(title, tags)
+        else
+          tag_wrapper(title, tags, :dt => options, :dd => { :class => "elements_#{@bundle_counter}" })
+        end
       end
 
       # The definition type dt tag

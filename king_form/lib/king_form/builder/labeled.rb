@@ -86,7 +86,7 @@ module KingForm
       def tag_wrapper(fieldname_or_title, tags, options = {})
         if @config[:bundle]
           @bundle_counter += 1
-          tags
+          tags.html_safe
         elsif @config[:table] # called from "table" => build a table cell (td)
           # Only in first row: Build column header
           if @config[:row_number] == 1

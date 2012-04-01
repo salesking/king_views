@@ -53,7 +53,7 @@ module KingForm
         name, infos, opts = build_id_name_info(name, opts)
         @template.text_field_tag(name, value, opts) + infos
       end
-      
+
       # Create a hidden field tag and construct its fieldname (object[name]) from
       # the current object
       # When the name is beeing passed in as string its just taken like it is
@@ -132,7 +132,7 @@ module KingForm
           # build info tag, cause info_tag(:symbol) is looking into I18n transl
           infos = info_tag( opts.delete(:info) || name)
           #now set real name as string
-          name = "#{@object_name}[#{name}]"
+          name = "#{@object_name}[#{name}]".html_safe
         else
           opts[:id] ||= nil
           info_text = opts.delete(:info)
