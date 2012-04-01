@@ -94,14 +94,15 @@ module KingList
       def action_column(options={}, &block)
         case mode
           when :header
-            @template.concat("<th>#{I18n.t(:'link.actions')}</th>".html_safe)
+            "<th>#{I18n.t(:'link.actions')}</th>".html_safe
           when :content
             td_options = options[:td_options] || {}
             td_options[:class] = [td_options[:class]].flatten || []
             td_options[:class] << 'actions'
-            @template.concat("<td #{ to_attr(td_options) }><ul class='actions'>".html_safe)
-            @template.concat( @template.capture_haml(&block) )
-            @template.concat("</ul></td>".html_safe)
+            res = "<td #{ to_attr(td_options) }><ul class='actions'>"
+            res << @template.capture(&block)
+            res << "</ul></td>"
+            res.html_safe
         end
       end
 

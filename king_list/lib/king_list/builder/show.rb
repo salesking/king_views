@@ -60,12 +60,12 @@ module KingList
         end
 
         # Against HTML validity warnings
-        caption = '&nbsp;' if caption.blank?
-        value = '&nbsp;' if value.blank?
+        caption = '&nbsp;'.html_safe if caption.blank?
+        value = '&nbsp;'.html_safe if value.blank?
 
         @template.capture_haml do
-          @template.haml_tag :dt, caption.html_safe, dt_options || options
-          @template.haml_tag :dd, value.html_safe, dd_options || options
+          @template.haml_tag :dt, caption, dt_options || options
+          @template.haml_tag :dd, value, dd_options || options
         end
       end
 
