@@ -85,7 +85,7 @@ module KingForm
             @template.haml_tag(:td, tags.to_s, options)
           end
         else #wrap or no wrap
-          @no_wrap ? tags : dt_tag(fieldname_or_title, options[:dt]) + dd_tag(tags.to_s, options[:dd])
+          (@no_wrap ? tags : dt_tag(fieldname_or_title, options[:dt]) + dd_tag(tags.to_s, options[:dd])).html_safe
         end
       end
 
