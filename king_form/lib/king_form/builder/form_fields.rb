@@ -219,7 +219,7 @@ module KingForm
             select_options << "</optgroup>"
           end
         end
-        tag_wrapper title, select_tag(fieldname, select_options, options)
+        tag_wrapper title, select_tag(fieldname, select_options.html_safe, options)
       end
 
       def time_zone_selection(fieldname, options = {}, html_options = {})
