@@ -7,7 +7,7 @@ module KingFormat
   # -
   module MoneyHelper
 
-    # returns the keys from money symbols als Hash{array} for select options 
+    # returns the keys from money symbols als Hash{array} for select options
     def money_selects
       money_symbols.keys.sort
     end
@@ -37,7 +37,7 @@ module KingFormat
         'HUF' => nil,
         'LTL' => nil,
         'LVL' => nil,
-        'PLN' => nil,
+        'PLN' => eur.merge(:unit=>'zł'),
         'RON' => nil,
         'SEK' => nil,
         'SKK' => nil,
@@ -60,6 +60,6 @@ module KingFormat
       }
       end
     end
-   
+
   end
 end
