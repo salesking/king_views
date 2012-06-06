@@ -107,10 +107,10 @@ module KingFormat
     #   => 7,5%
     def number_to_percentage_auto_precision(number)
       return nil unless number
-      # for now use separator
-      pres = (number.to_i == number.to_f) ? 0 : 1
       sep =  I18n.t(:'number.format.separator')
-      number_to_percentage(number,{:precision => pres, :separator=>sep } )
+      number_to_percentage(number,{ :separator=>sep,
+                                    :precision => 4,
+                                    :strip_insignificant_zeros=>true } )
     end
 
     # Translate the value of an enum field, as defined by act_as_enum
