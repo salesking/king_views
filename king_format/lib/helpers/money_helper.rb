@@ -18,8 +18,8 @@ module KingFormat
     #   'USD' => {:unit=>'$'}
     def money_symbols
       @money_symbols ||= begin
-        eur = {:format => '%n %u', :precision=> '2',:delimiter=>'.', :separator=>','}
-        dol = {:format => '%n %u', :precision=> '2',:delimiter=>',', :separator=>'.'}
+        eur = {:format => '%n %u', :precision => '2',:delimiter => '.', :separator => ','}
+        dol = {:format => '%u%n', :precision => '2',:delimiter => ',', :separator => '.'}
         {
         'EUR' => eur.merge(:unit=>'€'),
         'GBP' => dol.merge(:unit=>'£'),
