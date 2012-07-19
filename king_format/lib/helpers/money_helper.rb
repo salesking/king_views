@@ -37,7 +37,7 @@ module KingFormat
         'HUF' => nil,
         'LTL' => nil,
         'LVL' => nil,
-        'PLN' => eur.merge(:unit=>'zł'),
+        'PLN' => eur.merge(:unit=>'zł', :delimiter => ' '),
         'RON' => nil,
         'SEK' => nil,
         'SKK' => nil,
