@@ -5,7 +5,11 @@ module KingFormat
   module PercentFields
 
     def self.included(base)
-      base.send :class_inheritable_accessor, :percent_fields
+      if ActiveSupport::VERSION::MAJOR == 3 && ActiveSupport::VERSION::MINOR > 0
+        base.class_attribute :percent_fields
+      else
+        base.send :class_inheritable_accessor, :percent_fields
+      end
       base.percent_fields = []
       base.extend(ClassMethods)
     end

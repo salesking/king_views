@@ -2,7 +2,11 @@ module KingFormat
   module MoneyFields
 
     def self.included(base)
-      base.send :class_inheritable_accessor, :money_fields
+      if ActiveSupport::VERSION::MAJOR == 3 && ActiveSupport::VERSION::MINOR > 0
+        base.class_attribute :money_fields
+      else
+        base.send :class_inheritable_accessor, :money_fields
+      end
       base.money_fields = []
       base.extend(ClassMethods)
     end
@@ -37,6 +41,6 @@ module KingFormat
         self.class.is_money_field?(fieldname)
       end
     end
-    
+
   end #Fields
 end#KingFormat

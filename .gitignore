@@ -12,9 +12,6 @@ tmtags
 
 ## VIM
 *.swp
-## Netbeans
-nbproject/*
-
 ## PROJECT::GENERAL
 rdoc
 pkg
