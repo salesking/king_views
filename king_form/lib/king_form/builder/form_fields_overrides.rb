@@ -16,9 +16,9 @@ module KingForm
         super(method, opts) + info_tag(info_text || method)
       end
 
-      def check_box(method, opts = {})
+      def check_box(method, opts = {}, checked_value = "1", unchecked_value = "0")
         info_text = opts.delete(:info)
-        super(method, opts) + info_tag(info_text || method)
+        super(method, opts, checked_value, unchecked_value) + info_tag(info_text || method)
       end
 
       def radio_button(method, tag_value, opts = {})
