@@ -276,7 +276,7 @@ module KingList
             method_tag +
             request_token_tag +
             hidden_tag +
-            "<button type='submit' name='submit' title='#{options[:title]}' class='#{options[:class]}'><span>#{options[:title]}</span></button>" +
+            "<button type='submit' name='submit'#{" id='#{options[:id]}'" if options[:id].present?} title='#{options[:title]}' class='#{options[:class]}'><span>#{options[:title]}</span></button>" +
          "</div></form>".html_safe
     end
 
