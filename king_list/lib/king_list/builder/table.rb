@@ -99,6 +99,7 @@ module KingList
             td_options = options[:td_options] || {}
             td_options[:class] = [td_options[:class]].flatten || []
             td_options[:class] << 'actions'
+            td_options[:class] = td_options[:class].compact.join(' ')
             res = "<td #{ to_attr(td_options) }><ul class='actions'>"
             res << @template.capture(&block)
             res << "</ul></td>"
