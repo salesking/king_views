@@ -154,6 +154,7 @@ module KingForm
         options[:include_blank] = true unless options.has_key?(:include_blank)
         options[:selected] ||= value.is_a?(Array) ? value : value.to_s
 
+        html_options[:'data-placeholder'] ||= title
         # Got an AR object so full automatic contruction should work
         if current_object.is_a?(ActiveRecord::Base) && fieldname.is_a?(Symbol)
           # try to sort by key f.ex. when transl. enum_fields
