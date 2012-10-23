@@ -63,7 +63,7 @@ module KingFormat
       elsif (object.class.is_money_field?(fld) rescue nil) || opts[:currency]
         format_method = "#{fld}_format_opts".to_sym
         # check if the object has a custom money format method => price_total_format_opts
-        fopts = object && object.respond_to?(format_method) ? object.send(format_method) : opts[:currency]
+        fopts = object && object.respond_to?(format_method) ? object.send(format_method) : (opts[:currency].present? ? opts[:currency] : {:object => object})
         strfmoney(val, fopts)
       elsif ( val.is_a?(Date) || (object.class.is_date_field?(fld) rescue nil) || opts[:date] )
         return val if val.blank? # blank value can occur when a is_date_field is empty
