@@ -63,8 +63,8 @@ module KingFormat
       elsif (object.class.is_money_field?(fld) rescue nil) || opts[:currency]
         format_method = "#{fld}_format_opts".to_sym
         # check if the object has a custom money format method => price_total_format_opts
-        fopts = object && object.respond_to?(format_method) ? object.send(format_method) : (opts[:currency].present? ? opts[:currency] : {:object => object})
-        strfmoney(val, fopts)
+        fopts = object && object.respond_to?(format_method) ? object.send(format_method) : opts[:currency]
+        strfmoney(val, fopts, object)
       elsif ( val.is_a?(Date) || (object.class.is_date_field?(fld) rescue nil) || opts[:date] )
         return val if val.blank? # blank value can occur when a is_date_field is empty
         # get date from opts or default or fallback into i18n
@@ -89,7 +89,7 @@ module KingFormat
     # val<Number>:: the number to format
     # opts<Hash{Symbol=>String}>:: Rails compatible currency formatting options,
     # when nil searches default format, last exit is rails i18n
-    def strfmoney(val, opts=nil)
+    def strfmoney(val, opts=nil, object = nil)
       settings = opts || default_currency_format || {}
       number_to_currency(val, settings.merge({:locale => I18n.locale}).to_hash)
     end
