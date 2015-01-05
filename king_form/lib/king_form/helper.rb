@@ -35,7 +35,17 @@ module KingForm
     def dl_fields_for(record_or_name_or_array, *args, &block)
       options = args.last.is_a?(Hash) ? args.pop : {}
       options[:builder] =  KingForm::Builder::DefinitionList
-      fields_for(record_or_name_or_array, *(args << options), &block)
+
+      case record_or_name_or_array
+      when String, Symbol
+        object_name = record_or_name_or_array
+        object = args.first
+      else
+        object = record_or_name_or_array
+        object_name = ActiveModel::Naming.singular(object)
+      end
+
+      fields_for(object_name, object, options, &block)
     end
 
     # renders a form with the KingForm::Builder::Labeled
