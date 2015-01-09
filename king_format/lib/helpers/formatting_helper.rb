@@ -132,6 +132,7 @@ module KingFormat
       defaults = klass.lookup_ancestors.map do |_klass|
         :"#{klass.i18n_scope}.attributes.#{_klass.model_name.i18n_key}.enum.#{fieldname.to_s}.#{value.to_s}"
       end
+      defaults << klass.human_attribute_name("enum.#{fieldname.to_s}.#{value.to_s}")
 
       I18n.translate(default: defaults)
     end
