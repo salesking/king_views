@@ -129,7 +129,11 @@ module KingFormat
       # Don't translate blank value
       return nil if value.blank?
       #return the translation
-      I18n.t(:"#{klass.i18n_scope}.attributes.#{klass.model_name.i18n_key}.enum.#{fieldname.to_s}.#{value.to_s}", :default => klass.human_attribute_name("enum.#{fieldname.to_s}.#{value.to_s}"))
+      defaults = klass.lookup_ancestors.map do |_klass|
+        :"#{klass.i18n_scope}.attributes.#{_klass.model_name.i18n_key}.enum.#{fieldname.to_s}.#{value.to_s}"
+      end
+
+      I18n.translate(default: defaults)
     end
 
     # Returns the default date formatting, as string '%d.%m.%Y'
