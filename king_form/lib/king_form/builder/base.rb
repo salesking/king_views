@@ -168,7 +168,7 @@ module KingForm
         if values && values.first.is_a?(Symbol)
           values_with_translated_keys = {}
           values.each do |value|
-            key = current_class.human_attribute_name("enum.#{fieldname.to_s}.#{value.to_s}")
+            key = translate_namespaced_enum_key(current_class, fieldname, value)
             values_with_translated_keys[key] = value.to_s
           end
           return values_with_translated_keys
@@ -176,6 +176,17 @@ module KingForm
           #values are not symbols (probably not coming from acts_as_enum) =>return them unchanged
           return values
         end
+      end
+
+      # translation_key for fieldname
+      # replaces current_class.human_attribute_name("enum.#{fieldname.to_s}.#{value.to_s}")
+      # as `human_attribute_name` changed the way how "."'s are interpreted in 3.2.x (now as namespaces)
+      def translate_namespaced_enum_key(klass, field, value)
+        defaults = klass.lookup_ancestors.map do |_klass|
+          :"#{klass.i18n_scope}.attributes.#{_klass.model_name.i18n_key}.enum.#{field.to_s}.#{value.to_s}"
+        end
+
+        I18n.translate(default: defaults)
       end
 
       # add titles to Input-Tag and embed/wrap in dt/dd
