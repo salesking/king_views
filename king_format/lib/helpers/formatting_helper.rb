@@ -16,7 +16,7 @@ module KingFormat
     # When set this will be used instead of asking the object for its value.
     # See types for more
     # opts<Hash{Symbol=>String}>:: Options
-    #  
+    #
     # ==== Options opts
     #  :currency<Hash{Symbol=>String}>:: Currency settings to format string as
     #  money like found in rails I18n(see rails number_helper)
@@ -64,7 +64,7 @@ module KingFormat
         format_method = "#{fld}_format_opts".to_sym
         # check if the object has a custom money format method => price_total_format_opts
         fopts = object && object.respond_to?(format_method) ? object.send(format_method) : opts[:currency]
-        strfmoney(val, fopts)
+        strfmoney(val, fopts, object)
       elsif ( val.is_a?(Date) || (object.class.is_date_field?(fld) rescue nil) || opts[:date] )
         return val if val.blank? # blank value can occur when a is_date_field is empty
         # get date from opts or default or fallback into i18n
@@ -89,9 +89,9 @@ module KingFormat
     # val<Number>:: the number to format
     # opts<Hash{Symbol=>String}>:: Rails compatible currency formatting options,
     # when nil searches default format, last exit is rails i18n
-    def strfmoney(val, opts=nil)
+    def strfmoney(val, opts=nil, object = nil)
       settings = opts || default_currency_format || {}
-      number_to_currency(val, settings.merge({:locale => I18n.locale}))
+      number_to_currency(val, settings.merge({:locale => I18n.locale}).to_hash)
     end
 
     # Deprecated, to be dropped
@@ -107,10 +107,10 @@ module KingFormat
     #   => 7,5%
     def number_to_percentage_auto_precision(number)
       return nil unless number
-      # for now use separator
-      pres = (number.to_i == number.to_f) ? 0 : 1
       sep =  I18n.t(:'number.format.separator')
-      number_to_percentage(number,{:precision => pres, :separator=>sep } )
+      number_to_percentage(number,{ :separator=>sep,
+                                    :precision => 4,
+                                    :strip_insignificant_zeros=>true } )
     end
 
     # Translate the value of an enum field, as defined by act_as_enum
@@ -129,9 +129,14 @@ module KingFormat
       # Don't translate blank value
       return nil if value.blank?
       #return the translation
-      klass.human_attribute_name("enum.#{fieldname.to_s}.#{value.to_s}")
+      defaults = klass.lookup_ancestors.map do |_klass|
+        :"#{klass.i18n_scope}.attributes.#{_klass.model_name.i18n_key}.enum.#{fieldname.to_s}.#{value.to_s}"
+      end
+      defaults << klass.human_attribute_name("enum.#{fieldname.to_s}.#{value.to_s}")
+
+      I18n.translate(default: defaults)
     end
-    
+
     # Returns the default date formatting, as string '%d.%m.%Y'
     # The returned string is passed to strftime(format)
     # Override this function or set the thread var somehere in your including
@@ -142,7 +147,7 @@ module KingFormat
     def default_date_format
       Thread.current[:default_date_format]
     end
-   
+
     # Returns the default currency formatting, in I18n style
     # The returned hash is used in rails number_to_currency helper.
     # Override this function or set the thread var somehere in your including
@@ -154,17 +159,17 @@ module KingFormat
     def default_currency_format
       Thread.current[:default_currency_format]
     end
-    
-    # Formats a number to the visible decimal places. If there are more decimal 
+
+    # Formats a number to the visible decimal places. If there are more decimal
     # places than the given prescision those are used.
     #
     # === Examples
     #   auto_precision(1.2340, 2)
     #   => "1.234"
-    #   
+    #
     #   auto_precision(1.234500)
     #   => "1.2345"
-    #   
+    #
     #   auto_precision(1.2345, 5)
     #   => "1.23450"
     #
@@ -182,5 +187,5 @@ module KingFormat
       "%01.#{precision}f" % rounded_number
     end
 
-  end # FormattingHelper  
+  end # FormattingHelper
 end # KingFormat

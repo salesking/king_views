@@ -70,7 +70,7 @@ module KingForm
         @bundle_counter = 0
         tags = @template.capture(&block)
         @config[:bundle] = false
-        @template.concat( tag_wrapper(title, tags, options) )
+        tag_wrapper(title, tags.html_safe, options)
       end
 
       # Add titles/labels to input tag and wrap in div
@@ -86,7 +86,7 @@ module KingForm
       def tag_wrapper(fieldname_or_title, tags, options = {})
         if @config[:bundle]
           @bundle_counter += 1
-          tags
+          tags.html_safe
         elsif @config[:table] # called from "table" => build a table cell (td)
           # Only in first row: Build column header
           if @config[:row_number] == 1
@@ -102,7 +102,7 @@ module KingForm
                 else # other tags stay outside label tag, because they don't like to be wrapped sometimes
                   label_tag(fieldname_or_title, options[:label]) + tags
                 end
-          "<div> #{out}</div>"
+          "<div> #{out}</div>".html_safe
         end
       end
 

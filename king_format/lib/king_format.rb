@@ -1,4 +1,6 @@
+require 'active_support'
 require 'active_support/deprecation'
+require 'active_support/version'
 # KingFormat
 $LOAD_PATH << File.expand_path(File.dirname(__FILE__))
 

@@ -2,7 +2,11 @@ module KingFormat
   module DateFields
 
     def self.included(base)
-      base.send :class_inheritable_accessor, :date_fields
+      if ActiveSupport::VERSION::MAJOR == 3 && ActiveSupport::VERSION::MINOR > 0
+        base.class_attribute :date_fields
+      else
+        base.send :class_inheritable_accessor, :date_fields
+      end
       base.date_fields = []
       base.extend(ClassMethods)
     end
@@ -37,6 +41,6 @@ module KingFormat
         self.class.date_fields.include?(fieldname.to_sym)
       end
     end
-    
+
   end #Fields
 end#KingFormat

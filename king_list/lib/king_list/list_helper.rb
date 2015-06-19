@@ -30,7 +30,11 @@ module KingList
           object = args.first
         else
           object = record_or_name
-          object_name = ActionController::RecordIdentifier.singular_class_name(object)
+          object_name = if ActionController::RecordIdentifier.respond_to?(:singular_class_name)
+            ActionController::RecordIdentifier.singular_class_name(object) # rails 2
+           else #Rails 3
+              ActiveModel::Naming.singular(object)
+          end
       end
 
       haml_tag :dl, options do
@@ -81,71 +85,54 @@ module KingList
     # === Usage example:
     #
     # Header linking for all, default
-    #   - table_for(@users) do |t, user|
-    #     - t.column :name  # with sorting
-    #     - t.column :email
+    #   = table_for(@users) do |t, user|
+    #     = t.column :name  # with sorting
+    #     = t.column :email
     #
     # Header linking for all, but exclude individual columns from sorting:
-    #  - table_for(@users)do |t, user|
-    #    - t.column :name, :sorting => false  # without sorting
-    #    - t.column :last_name
+    #  = table_for(@users)do |t, user|
+    #    = t.column :name, :sorting => false  # without sorting
+    #    = t.column :last_name
     #
     # NO header linking for all columns:
-    #  - table_for(@users, :sorting => false) do |t, user|
-    #    - t.column :name
-    #    - t.column :email
+    #  = table_for(@users, :sorting => false) do |t, user|
+    #    = t.column :name
+    #    = t.column :email
     #
     # No header linking for all, but allow sorting for individual columns:
-    #  - table_for(@users, :sorting => false) do |t, user|
-    #    - t.column :name, :sorting => true # with sorting
-    #    - t.column :last_name
+    #  = table_for(@users, :sorting => false) do |t, user|
+    #    = t.column :name, :sorting => true # with sorting
+    #    = t.column :last_name
     #
     def table_for(collection, options={}, html_options={}, &block)
       return if collection.nil? || collection.empty?
-      table_str = ''
       builder = KingList::Builder::Table.new(render_context, collection)
       # extract options
       builder.sorting = options.delete(:sorting) != false # default => true
-
-      #@elapsed = Benchmark.realtime do
-
-      # First step: Yield the block just for counting the columns
-      builder.mode = :counter
-      builder.start_row(collection.first)
-      yield(builder, builder.current_record)
-
-      haml_tag :table, { :summary => '' }.merge(html_options) do
+      capture do
+        concat("<table #{ to_attr(html_options) }><thead><tr>".html_safe)
         # Build header row
-        haml_tag :thead do
-          haml_tag :tr do
-            builder.mode = :header
-            builder.start_row(collection.first)
-            yield(builder, builder.current_record)
-          end
+        builder.mode = :header
+        builder.current_record = collection.first
+        yield(builder, builder.current_record)
+        concat("</tr></thead><tbody>".html_safe)
+        builder.mode = :content
+        # Build content row for each collection item
+        collection.each do |c|
+          builder.current_record = c
+          concat("<tr>".html_safe)
+          yield(builder, builder.current_record)
+          concat("</tr>".html_safe)
         end
-
-        # TODO: Build footer here
-        # haml_tag :tfoot do
-        # end
-
-        haml_tag :tbody do
-          builder.mode = :content
-          # Build content row for each collection item
-          collection.each do |c|
-            tr_options = {}
-            # zebra styling
-            tr_options[:class] = render_context.cycle('odd','even')
-
-            haml_tag :tr, tr_options do
-              builder.start_row(c)
-              yield(builder, builder.current_record)
-            end
-          end
-        end
-
+        concat( "</tbody></table>".html_safe)
       end
-      #end # benchmarking
-      #puts "Took #{@elapsed} seconds"
+    end
+
+    # TODO same in table class
+    #== Param
+    # opts<Hash{Symbol=>String}}>:. options used for html attributes
+    def to_attr(opts)
+      opts.collect{|k,v| "#{k}='#{v}'" }.join(' ')
     end
 
     # Show a list of options as ul / li list.
@@ -204,8 +191,8 @@ module KingList
     # You can set html options for both the li and the a tag
     #
     #===Example haml
-    #   action_text _('link.user.edit'), edit_object_path
-    #   action_text _('link.user.edit'), edit_object_path, {li html options}, {a html options :class=>'supercssclass'}
+    #   action_text t('link.user.edit'), edit_object_path
+    #   action_text t('link.user.edit'), edit_object_path, {li html options}, {a html options :class=>'supercssclass'}
     #
     #   =>   <li>
     #         <a href="/users/edit/12">
@@ -257,7 +244,10 @@ module KingList
     #
     def action_button(fieldname, options)
       render_context.capture_haml do
-        haml_tag :li, :class=>'form_btn' do
+        li_options = options.delete(:li_options) || {}
+        li_options[:class] ||= []
+        li_options[:class] << " form_btn"
+        haml_tag :li, li_options do
           haml_concat mini_action_form(fieldname, options)
         end
       end
@@ -286,8 +276,8 @@ module KingList
             method_tag +
             request_token_tag +
             hidden_tag +
-            "<button type='submit' name='submit' title='#{options[:title]}' class='#{options[:class]}'><span>#{options[:title]}</span></button>" +
-         "</div></form>"
+            "<button type='submit' name='submit'#{" id='#{options[:id]}'" if options[:id].present?} title='#{options[:title]}' class='#{options[:class]}'><span>#{options[:title]}</span></button>" +
+         "</div></form>".html_safe
     end
 
     # Renders a <ol> for a given collection and yields the block for every item
@@ -318,20 +308,23 @@ module KingList
     # Internal method used by action_text, action_button and action_icon
     # Directly returns a haml string into the template
     def action(kind, name_or_title, link_options, li_options={}, html_options={})
-      render_context.capture_haml do
-        haml_tag :li, li_options do
-          case kind
-            when :icon   then haml_concat link_to('', link_options, html_options)
-            when :text   then haml_concat link_to(name_or_title, link_options, html_options)
-            when :button then haml_concat button_to(name_or_title, link_options)
-          end
-        end
+
+      render_context.capture do
+        concat %{ <li #{ to_attr(li_options) }>
+        #{ case kind
+          when :icon
+            link_to('', link_options, html_options)
+          when :text
+            link_to(name_or_title, link_options, html_options)
+          when :button
+            button_to(name_or_title, link_options)
+        end } </li>}.html_safe
       end
     end
 
     def render_context
+      # rails 2 || rails 3.2
       @template || self
-      # if rails < 2 .. || rails 3
     end
 
   end #ListHelper

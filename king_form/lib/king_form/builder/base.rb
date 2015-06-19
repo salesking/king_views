@@ -57,7 +57,7 @@ module KingForm
         super(associated, opts)
       end
 
-      
+
       # wraps a list of action links/buttons in a td od div
       # those wrappers can then be formated with css td.actions
       # also see #ListHelper
@@ -112,7 +112,7 @@ module KingForm
       end
 
       # Build a single table row, only needed to be be able to render the table
-      # headers(th) 
+      # headers(th)
       def table_row(&block)
         @config[:row_number] += 1
         @template.concat "<tr> #{@template.capture(&block)}</tr>"
@@ -168,7 +168,7 @@ module KingForm
         if values && values.first.is_a?(Symbol)
           values_with_translated_keys = {}
           values.each do |value|
-            key = current_class.human_attribute_name("enum.#{fieldname.to_s}.#{value.to_s}")
+            key = translate_namespaced_enum_key(current_class, fieldname, value)
             values_with_translated_keys[key] = value.to_s
           end
           return values_with_translated_keys
@@ -176,6 +176,17 @@ module KingForm
           #values are not symbols (probably not coming from acts_as_enum) =>return them unchanged
           return values
         end
+      end
+
+      # translation_key for fieldname
+      # replaces current_class.human_attribute_name("enum.#{fieldname.to_s}.#{value.to_s}")
+      # as `human_attribute_name` changed the way how "."'s are interpreted in 3.2.x (now as namespaces)
+      def translate_namespaced_enum_key(klass, field, value)
+        defaults = klass.lookup_ancestors.map do |_klass|
+          :"#{klass.i18n_scope}.attributes.#{_klass.model_name.i18n_key}.enum.#{field.to_s}.#{value.to_s}"
+        end
+
+        I18n.translate(default: defaults)
       end
 
       # add titles to Input-Tag and embed/wrap in dt/dd
@@ -199,7 +210,7 @@ module KingForm
         else
           fieldname_or_title
         end
-      end      
+      end
 
       # Build span-tag with an info text after a field
       # ==== Parameter
@@ -210,18 +221,21 @@ module KingForm
         when String #just use the plain string
           value = fieldname_or_text
         when Symbol # lookup the the field in i18n under activerecord.attributes.class.fieldname_info
-          trans = I18n.translate("#{current_class.name.underscore}.#{fieldname_or_text.to_s}_info",
-                                 :default => '',
+          key = "#{current_class.name.underscore}.#{fieldname_or_text.to_s}_info"
+          trans = I18n.translate("#{key}_html",
+                                 :default => I18n.translate(key,
+                                   :default => '',
+                                   :scope => [:activerecord, :attributes]),
                                  :scope => [:activerecord, :attributes])
           value = trans.blank? ? nil : trans
         else
           raise ArgumentError
         end
 
-        value ? content_tag(:div, value, :class => 'info') : ''
+        value ? content_tag(:div, value.html_safe, :class => 'info').html_safe : ''
       end
 
-      
+
       # Create the id of a field
       # ==== Parameter
       # name<String>::The name of the id

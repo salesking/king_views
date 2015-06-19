@@ -45,6 +45,9 @@ module KingList
           object = @object
         end
 
+        dt_options = options.delete(:dt_options) if options.has_key?(:dt_options)
+        dd_options = options.delete(:dd_options) if options.has_key?(:dd_options)
+
         # Use given caption or translate column title
         caption = options.delete(:caption) || object.class.human_attribute_name(field_name.to_s)
 
@@ -57,15 +60,15 @@ module KingList
         end
 
         # Against HTML validity warnings
-        caption = '&nbsp;' if caption.blank?
-        value = '&nbsp;' if value.blank?
+        caption = '&nbsp;'.html_safe if caption.blank?
+        value = '&nbsp;'.html_safe if value.blank?
 
         @template.capture_haml do
-          @template.haml_tag :dt, caption, options
-          @template.haml_tag :dd, value, options
+          @template.haml_tag :dt, caption, dt_options || options
+          @template.haml_tag :dd, value, dd_options || options
         end
       end
-    
+
     end #class
   end # module
 end # module

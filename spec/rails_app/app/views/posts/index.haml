@@ -1,4 +1,23 @@
-- table_for(@posts) do |t, post|
-  = t.column :title
-  = t.column :created_at
-  = t.column :updated_at, :td_options => {:class=>'xy'}
+- t = Benchmark.bm(3) do |x|
+  =x.report('haml') do
+    %table
+      %thead
+        %tr
+          %th Title
+          %th Created at
+          %th Updated at
+      %tbody
+        - @posts.each do |p|
+          %tr
+            %td=p.title
+            %td=p.created_at
+            %td.someclass=p.updated_at
+
+- t = Benchmark.bm(3) do |x|
+  =x.report('table_for') do
+    - table_for(@posts) do |t, post|
+      = t.column :title
+      = t.column :created_at
+      = t.column :updated_at, :td_options => {:class=>'xy'}
+
+

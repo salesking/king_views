@@ -7,7 +7,7 @@ module KingFormat
   # -
   module MoneyHelper
 
-    # returns the keys from money symbols als Hash{array} for select options 
+    # returns the keys from money symbols als Hash{array} for select options
     def money_selects
       money_symbols.keys.sort
     end
@@ -18,8 +18,8 @@ module KingFormat
     #   'USD' => {:unit=>'$'}
     def money_symbols
       @money_symbols ||= begin
-        eur = {:format => '%n %u', :precision=> '2',:delimiter=>'.', :separator=>','}
-        dol = {:format => '%n %u', :precision=> '2',:delimiter=>',', :separator=>'.'}
+        eur = {:format => '%n %u', :precision => '2',:delimiter => '.', :separator => ','}
+        dol = {:format => '%u%n', :precision => '2',:delimiter => ',', :separator => '.'}
         {
         'EUR' => eur.merge(:unit=>'€'),
         'GBP' => dol.merge(:unit=>'£'),
@@ -37,7 +37,7 @@ module KingFormat
         'HUF' => nil,
         'LTL' => nil,
         'LVL' => nil,
-        'PLN' => nil,
+        'PLN' => eur.merge(:unit=>'zł', :delimiter => ' '),
         'RON' => nil,
         'SEK' => nil,
         'SKK' => nil,
@@ -60,6 +60,6 @@ module KingFormat
       }
       end
     end
-   
+
   end
 end
