@@ -118,7 +118,7 @@ module KingFormat
     #   client.sending_method = :fax
     #   translated_enum_value(client, :sending_method)
     #   => "activerecord.attributes.client.enum.sending_method.fax"
-    def translated_enum_value(object_or_class, fieldname, value = nil)
+    def translated_enum_value(object_or_class, fieldname, value = nil, locale = I18n.locale)
       if object_or_class.is_a?(Class)
         klass = object_or_class
       else
@@ -134,7 +134,7 @@ module KingFormat
       end
       defaults << klass.human_attribute_name("enum.#{fieldname.to_s}.#{value.to_s}")
 
-      I18n.translate(default: defaults)
+      I18n.translate(default: defaults, locale: locale)
     end
 
     # Returns the default date formatting, as string '%d.%m.%Y'
